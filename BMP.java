@@ -22,8 +22,8 @@ public class BMP {
         setHeight();
         setBitsPerPixel();
         setSize();
-        setUnparsedData();
-        getUnparsedData();
+        setData();
+        System.out.println(getHeight() + " x " + getWidth());
     }
 
     private void setWidth(){
@@ -177,11 +177,38 @@ public class BMP {
         }
     }
 
-    private void setParsedData(){
+    private void setData(){
         try {
             FileInputStream in = new FileInputStream(this.fileLocation);
             BufferedInputStream buffer = new BufferedInputStream(in);
-            this.parsedData = new int[][][]
+            
+            switch (this.bitsPerPixel) {
+                case 1:
+                    
+                    break;
+                case 4:
+                    break;
+                default:
+                    int pixelSize = this.bitsPerPixel / 8;
+                    this.unparsedData = new byte[this.width * this.height * pixelSize];
+                    buffer.skip(61);
+                    buffer.read(this.unparsedData);
+                    int index = 0;
+                    for (int i = 0; i < unparsedData.length; i += pixelSize){
+                        int blue = unparsedData[i] & 0xff;
+                        int green = unparsedData[i + 1] & 0xff;
+                        int red = unparsedData[i + 2] & 0xff;
+                        System.out.println(index + " / " + red + " : " + green + " : " + blue);
+                        index++;
+                        if (index >= 15){
+                            index = 0;
+                        }
+                    }
+
+                    in.close();
+                    buffer.close();
+                    break;
+            }
 
         } catch (IOException exception){
             exception.printStackTrace();
@@ -210,4 +237,76 @@ public class BMP {
             System.out.println(this.unparsedData[i]);
         }
     }
+
+    public void setParsedData(){
+        try {
+            // Open the BMP file
+            FileInputStream fis = new FileInputStream(this.fileLocation);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+
+            // Read BMP headers to get image dimensions and pixel format
+            byte[] header = new byte[54];
+            bis.read(header);
+            
+            // Extract image width and height
+            int width = ((header[21] & 0xff) << 24) | ((header[20] & 0xff) << 16) | ((header[19] & 0xff) << 8) | (header[18] & 0xff);
+            int height = ((header[25] & 0xff) << 24) | ((header[24] & 0xff) << 16) | ((header[23] & 0xff) << 8) | (header[22] & 0xff);
+
+            // Determine pixel format (color depth)
+            int pixelSize = bitsPerPixel / 8; // bytes per pixel
+            int imageDataOffset = ((header[13] & 0xff) << 24) | ((header[12] & 0xff) << 16) | ((header[11] & 0xff) << 8) | (header[10] & 0xff);
+
+            // Move to the beginning of pixel data
+            bis.skip(imageDataOffset - 54);
+
+            // Read pixel data based on color depth
+            byte[] pixelData = new byte[width * height * pixelSize];
+            bis.read(pixelData);
+
+            // Extract colors from pixel data based on color depth
+            switch (bitsPerPixel) {
+                case 1:
+                    
+                    // Handle 1-bit pixel data
+                    // Implement logic to extract colors from 1-bit pixel data
+                    break;
+                case 4:
+
+                    // Handle 4-bit pixel data
+                    // Implement logic to extract colors from 4-bit pixel data
+                    break;
+                case 8:
+                    // Handle 8-bit pixel data
+                    // Implement logic to extract colors from 8-bit pixel data
+                    break;
+                case 16:
+                    // Handle 16-bit pixel data
+                    // Implement logic to extract colors from 16-bit pixel data
+                    break;
+                case 24:
+                    // Handle 24-bit pixel data (already implemented)
+                    for (int i = 0; i < pixelData.length; i += pixelSize) {
+                        int blue = pixelData[i] & 0xff;
+                        int green = pixelData[i + 1] & 0xff;
+                        int red = pixelData[i + 2] & 0xff;
+                        // Do something with the extracted color
+                    }
+                    break;
+                case 32:
+                    // Handle 32-bit pixel data
+                    // Implement logic to extract colors from 32-bit pixel data
+                    break;
+                default:
+                    // Unsupported color depth
+                    System.err.println("Unsupported color depth: " + bitsPerPixel);
+            }
+
+            // Close input streams
+            bis.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+        
 }
