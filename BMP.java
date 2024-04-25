@@ -132,6 +132,7 @@ public class BMP {
     }
     
     private void setParsedPixelData(){
+        int index = 0;
         switch (this.bitsPerPixel) {
             case 1:
                 //a byte represents 8 pixels
@@ -144,14 +145,24 @@ public class BMP {
                 break;
             case 8:
                 //1 byte represents 1 pixel
+                this.parsedPixelData = new int[this.height * this.width][1];
+                for (int i = 0; i < this.unparsedPixelData.length; i++){
+                    parsedPixelData[index][0] = unparsedPixelData[i] & 0xff;
+                    index++;
+                }
                 break;
             case 16:
                 //2 bytes represents 1 pixel
+                this.parsedPixelData = new int[this.height * this.width][2];
+                for (int i = 0; i < this.unparsedPixelData.length; i+= 2){
+                    parsedPixelData[index][1] = unparsedPixelData[i] & 0xff;
+                    parsedPixelData[index][0] = unparsedPixelData[i + 1] & 0xff;
+                    index++;
+                }
                 break;
             case 24:
                 //3 bytes represents 1 pixel
-                this.parsedPixelData = new int[this.height * this.width * 3][3];
-                int index = 0;
+                this.parsedPixelData = new int[this.height * this.width][3];
                 for (int i = 0; i < this.unparsedPixelData.length; i+=3){
                     //rgb value but need to consider little endian since it will be bgr
                     parsedPixelData[index][2] = unparsedPixelData[i] & 0xff; //red
@@ -161,6 +172,14 @@ public class BMP {
                 }
                 break;
             case 32:
+                this.parsedPixelData = new int[this.height * this.width][3];
+                for (int i = 0; i < this.unparsedPixelData.length; i+=4){
+                    parsedPixelData[index][3] = unparsedPixelData[i] & 0xff;
+                    parsedPixelData[index][2] = unparsedPixelData[i + 1] & 0xff;
+                    parsedPixelData[index][1] = unparsedPixelData[i + 2] & 0xff;
+                    //parsedPixelData[index][0] = unparsedPixelData[i + 3] & 0xff; //this is the alpha channel so it will regulate opacity i belive (not necessary)
+                    index++;
+                }
                 //4 bytes represents 1 pixel
                 break;
             default:
