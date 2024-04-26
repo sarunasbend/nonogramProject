@@ -12,6 +12,7 @@ public class BMP {
     private int size;
     private int bitsPerPixel;
     private int pixelDataLocation; //necessary as not all bmp's pixel data starts at byte 62
+    private byte[] colourPalette; //only needed for bit-depths for 1,4,8
     private byte[] unparsedPixelData;
     private int[][] parsedPixelData;
 
@@ -26,8 +27,6 @@ public class BMP {
         setPixelDataLocation();
         setUnparsedPixelData();
         setParsedPixelData();
-        System.out.println(getBitsPerPixel());
-        
     }
         
     //creates a txt of the all the values held in the bmp file, so its readable 
@@ -113,6 +112,15 @@ public class BMP {
         return this.pixelDataLocation;
     }
 
+    private void setColourPalette(){
+        //only necessary for bit-depths 1, 4, 8
+        //pixel data is actually an index to an RGB value
+    }
+
+    public void getColourPalette(){
+
+    }
+
     private void setUnparsedPixelData(){
         try {
             FileInputStream bmp = new FileInputStream(this.fileLocation);
@@ -134,6 +142,8 @@ public class BMP {
     
     private void setParsedPixelData(){
         int index = 0;
+        //with bit depths 1, 4, 8, instead of storing the colour in the actual pixel data, 
+        //it is actually an index to the colour palette 
         switch (this.bitsPerPixel) {
             case 1:
                 //a byte represents 8 pixels
@@ -164,9 +174,10 @@ public class BMP {
                     int red = (unparsedPixelData[i + 1] & 0b11111) & 0xff; //0b is used to represent base 2 numbers
                     int green = ((unparsedPixelData[i + 1] & 0b11100000) | (unparsedPixelData[i] & 0b11)) & 0xff;
                     int blue = (unparsedPixelData[i] & 0b11111000) & 0xff;
-                    parsedPixelData[index][0] = red;
-                    parsedPixelData[index][1] = green;
-                    parsedPixelData[index][2] = blue;
+                    //currently in rgb656 format, converts to 255, 255, 255 rgb values
+                    parsedPixelData[index][0] = (red * 255) / 31; //max val of 31 with 5 bits
+                    parsedPixelData[index][1] = (green * 255) / 53; //max val of 53 with 6 bits
+                    parsedPixelData[index][2] = blue / 31;
                     index++;
                 }
                 break;
