@@ -154,6 +154,20 @@ public class BMP {
                 if (this.width % 4 != 0){
                     padding = (4 - (this.width % 4));
                 }
+                this.parsedPixelData = new int[this.height * this.width * 3][3];
+                for (int i = 0; i < this.unparsedPixelData.length; i++){
+                    for (int j = 0; j < 8; j++){
+                        if ((unparsedPixelData[i] & (1 << j)) == 0){
+                            parsedPixelData[index][0] = 255;
+                            parsedPixelData[index][1] = 255;
+                            parsedPixelData[index][2] = 255;
+                        }
+                        index++;
+                    }
+                    if ((i + 1) % this.width == 0){
+                        i = i + padding;
+                    }
+                }
                 break;
             case 4:
                 //1 byte represents 2 pixels
