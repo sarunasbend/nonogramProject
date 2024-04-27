@@ -27,6 +27,7 @@ public class BMP {
         setPixelDataLocation();
         setUnparsedPixelData();
         setParsedPixelData();
+        printParsedPixelData();
     }
         
     //creates a txt of the all the values held in the bmp file, so its readable 
@@ -142,35 +143,47 @@ public class BMP {
     
     private void setParsedPixelData(){
         int index = 0;
+        int padding = 0;
         //with bit depths 1, 4, 8, instead of storing the colour in the actual pixel data, 
         //it is actually an index to the colour palette 
         switch (this.bitsPerPixel) {
             case 1:
                 //a byte represents 8 pixels
-                //colour is either black or white
                 //white is 1
                 //black is 0
+                if (this.width % 4 != 0){
+                    padding = (4 - (this.width % 4));
+                }
                 break;
             case 4:
                 //1 byte represents 2 pixels
+                if (this.width % 4 != 0){
+                    padding = (4 - (this.width % 4));
+                }
                 break;
             case 8:
                 //1 byte represents 1 pixel
+                if (this.width % 4 != 0){
+                    padding = (4 - (this.width % 4));
+                }
                 this.parsedPixelData = new int[this.height * this.width][1];
                 for (int i = 0; i < this.unparsedPixelData.length; i++){
                     parsedPixelData[index][0] = unparsedPixelData[i] & 0xff;
                     index++;
+                    if ((i + 1) % this.width == 0){
+                        i = i + padding;
+                    }
                 }
                 break;
             case 16:
-                //2 bytes represents 1 pixel
-                //the bytes are divided into 3
-                    //5 bits for red
-                    //5 bits for green (sometimes 6 bits, will account for 6)
-                    //5 bits for blue
-                    //colours will be in RGB555/RGB565, will need to translate into 3 byte RGB representation
+                //2 bytes represents 1 pixel            
+                //bytes are split into RGB555/RGB656, 5 bits for red, 5/6 bits for green, 5 bits for blue
+                    if (this.width % 4 != 0){
+                        padding = (4 - (this.width % 4));
+                    }
                 this.parsedPixelData = new int[this.height * this.width][3];
                 for (int i = 0; i < this.unparsedPixelData.length; i+= 2){
+                    //assumes it is in RBG565
                     int red = (unparsedPixelData[i + 1] & 0b11111) & 0xff; //0b is used to represent base 2 numbers
                     int green = ((unparsedPixelData[i + 1] & 0b11100000) | (unparsedPixelData[i] & 0b11)) & 0xff;
                     int blue = (unparsedPixelData[i] & 0b11111000) & 0xff;
@@ -179,24 +192,36 @@ public class BMP {
                     parsedPixelData[index][1] = (green * 255) / 53; //max val of 53 with 6 bits
                     parsedPixelData[index][2] = blue / 31;
                     index++;
+                    if (((i + 1) % this.width) == 0){
+                        i = i + padding;
+                    }
                 }
                 break;
             case 24:
                 //i believe it is working correctly
                 //3 bytes represents 1 pixel
                 //with each byte representing an RGB value
+                if (this.width % 4 != 0){
+                    padding = (4 - (this.width % 4));
+                }
                 this.parsedPixelData = new int[this.height * this.width][3];
                 for (int i = 0; i < this.unparsedPixelData.length; i+=3){
                     //rgb value but need to consider little endian since it will be bgr
-                    parsedPixelData[index][2] = unparsedPixelData[i] & 0xff; //red
+                    parsedPixelData[index][2] = unparsedPixelData[i] & 0xff; //blue
                     parsedPixelData[index][1] = unparsedPixelData[i + 1] & 0xff; //green
-                    parsedPixelData[index][0] = unparsedPixelData[i + 2] & 0xff; //blue
+                    parsedPixelData[index][0] = unparsedPixelData[i + 2] & 0xff; //red
                     index++;
+                    if (((i + 1) % this.width) == 0){
+                        i = i + padding;
+                    }
                 }
                 break;
             case 32:
                 //this does not work as it gets out of bound for the arrays
                 //the conversion is also not correct as it is simply case 24 copies (for now)
+                if (this.width % 4 != 0){
+                    padding = (4 - (this.width % 4));
+                }
                 this.parsedPixelData = new int[this.height * this.width][3];
                 for (int i = 0; i < this.unparsedPixelData.length; i+=4){
                     parsedPixelData[index][2] = unparsedPixelData[i] & 0xff;
@@ -204,8 +229,10 @@ public class BMP {
                     parsedPixelData[index][0] = unparsedPixelData[i + 2] & 0xff;
                     //parsedPixelData[index][0] = unparsedPixelData[i + 3] & 0xff; //this is the alpha channel so it will regulate opacity i belive (not necessary)
                     index++;
+                    if (((i + 1) % this.width) == 0){
+                        i = i + padding;
+                    }
                 }
-                //4 bytes represents 1 pixel
                 break;
             default:
                 //not one of the 5 types, thus an issue loading the image
