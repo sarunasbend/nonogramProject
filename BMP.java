@@ -27,6 +27,7 @@ public class BMP {
         setPixelDataLocation();
         setUnparsedPixelData();
         setParsedPixelData();
+        System.out.println(getHeight() * getWidth());
         printParsedPixelData();
     }
         
@@ -149,24 +150,30 @@ public class BMP {
         switch (this.bitsPerPixel) {
             case 1:
                 //a byte represents 8 pixels
-                //white is 1
-                //black is 0
+                //white is 0
+                //black is 1
                 if (this.width % 4 != 0){
                     padding = (4 - (this.width % 4));
                 }
+                int validBits = 0;
                 this.parsedPixelData = new int[this.height * this.width * 3][3];
                 for (int i = 0; i < this.unparsedPixelData.length; i++){
-                    for (int j = 0; j < 8; j++){
+                    for (int j = 0; j <= 7; j++){
+                        validBits++;
+                        if ((validBits) % this.width == 0){
+                            i = i + padding;
+                            validBits = 0;
+                            break;
+                        }
                         if ((unparsedPixelData[i] & (1 << j)) == 0){
                             parsedPixelData[index][0] = 255;
                             parsedPixelData[index][1] = 255;
                             parsedPixelData[index][2] = 255;
                         }
+                        
                         index++;
                     }
-                    if ((i + 1) % this.width == 0){
-                        i = i + padding;
-                    }
+                    
                 }
                 break;
             case 4:
@@ -192,9 +199,9 @@ public class BMP {
             case 16:
                 //2 bytes represents 1 pixel            
                 //bytes are split into RGB555/RGB656, 5 bits for red, 5/6 bits for green, 5 bits for blue
-                    if (this.width % 4 != 0){
-                        padding = (4 - (this.width % 4));
-                    }
+                if (this.width % 4 != 0){
+                    padding = (4 - (this.width % 4));
+                }
                 this.parsedPixelData = new int[this.height * this.width][3];
                 for (int i = 0; i < this.unparsedPixelData.length; i+= 2){
                     //assumes it is in RBG565
