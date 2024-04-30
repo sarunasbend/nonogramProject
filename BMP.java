@@ -27,9 +27,6 @@ public class BMP {
         setPixelDataLocation();
         setUnparsedPixelData();
         setParsedPixelData();
-        System.out.println(getHeight() * getWidth());
-        System.out.println(getBitsPerPixel());
-        printParsedPixelData();
     }
         
     //creates a txt of the all the values held in the bmp file, so its readable 
@@ -120,7 +117,7 @@ public class BMP {
         //pixel data is actually an index to an RGB value
     }
 
-    public void getColourPalette(){
+    private void getColourPalette(){
 
     }
 
@@ -166,7 +163,7 @@ public class BMP {
                 for (int i = 0; i < this.unparsedPixelData.length; i++){
                     for (int j = 7; j >= 0; j--){
                         validBits++;
-                        if ((unparsedPixelData[i] & (1 << j)) != 0){
+                        if ((unparsedPixelData[i] & (1 << j)) == 0){
                             parsedPixelData[index][0] = 255;
                             parsedPixelData[index][1] = 255;
                             parsedPixelData[index][2] = 255;
@@ -266,6 +263,11 @@ public class BMP {
         }
     }
 
+    //get the result of the data parsing
+    public int[][] getParsedPixelData(){
+        return this.parsedPixelData;
+    }
+
     //debugging method, to see if the header aligns with the .txt file generated
     private void printHeader(){
         for (int i = 0; i < this.header.length; i++){
@@ -280,6 +282,7 @@ public class BMP {
         }
     }
 
+    //debugging method, to see if the parsed pixel data aligns with the UnparsedData
     private void printParsedPixelData(){
         for (int i = 0; i < this.parsedPixelData.length; i++){
             System.out.println(i + " : " + this.parsedPixelData[i][0] + ", " + this.parsedPixelData[i][1] + ", " + this.parsedPixelData[i][2]);
