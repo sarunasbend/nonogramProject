@@ -28,6 +28,7 @@ public class BMP {
         setUnparsedPixelData();
         setParsedPixelData();
         System.out.println(getHeight() * getWidth());
+        System.out.println(getBitsPerPixel());
         printParsedPixelData();
     }
         
@@ -145,6 +146,8 @@ public class BMP {
     private void setParsedPixelData(){
         int index = 0;
         int padding = 0;
+        int validBits = 0;
+        int bytesTakenByRow;
         //with bit depths 1, 4, 8, instead of storing the colour in the actual pixel data, 
         //it is actually an index to the colour palette 
         switch (this.bitsPerPixel) {
@@ -152,28 +155,29 @@ public class BMP {
                 //a byte represents 8 pixels
                 //white is 0
                 //black is 1
-                if (this.width % 4 != 0){
-                    padding = (4 - (this.width % 4));
+                if ((this.width) % 8 == 0){
+                    bytesTakenByRow = ((this.width) / 8);
+                } else {
+                    bytesTakenByRow = ((this.width) / 8) + 1;
                 }
-                int validBits = 0;
-                this.parsedPixelData = new int[this.height * this.width * 3][3];
+                padding = ((4 - (bytesTakenByRow % 4)) % 4);
+                this.parsedPixelData = new int[this.height * this.width][3];
+
                 for (int i = 0; i < this.unparsedPixelData.length; i++){
-                    for (int j = 0; j <= 7; j++){
+                    for (int j = 7; j >= 0; j--){
                         validBits++;
+                        if ((unparsedPixelData[i] & (1 << j)) != 0){
+                            parsedPixelData[index][0] = 255;
+                            parsedPixelData[index][1] = 255;
+                            parsedPixelData[index][2] = 255;
+                        }
+                        index++;
                         if ((validBits) % this.width == 0){
                             i = i + padding;
                             validBits = 0;
                             break;
                         }
-                        if ((unparsedPixelData[i] & (1 << j)) == 0){
-                            parsedPixelData[index][0] = 255;
-                            parsedPixelData[index][1] = 255;
-                            parsedPixelData[index][2] = 255;
-                        }
-                        
-                        index++;
                     }
-                    
                 }
                 break;
             case 4:
@@ -222,8 +226,8 @@ public class BMP {
                 //i believe it is working correctly
                 //3 bytes represents 1 pixel
                 //with each byte representing an RGB value
-                if (this.width % 4 != 0){
-                    padding = (4 - (this.width % 4));
+                if ((this.width * 3) % 4 != 0){
+                    padding = (4 - ((this.width * 3) % 4));
                 }
                 this.parsedPixelData = new int[this.height * this.width][3];
                 for (int i = 0; i < this.unparsedPixelData.length; i+=3){
@@ -232,7 +236,7 @@ public class BMP {
                     parsedPixelData[index][1] = unparsedPixelData[i + 1] & 0xff; //green
                     parsedPixelData[index][0] = unparsedPixelData[i + 2] & 0xff; //red
                     index++;
-                    if (((i + 1) % this.width) == 0){
+                    if (((i + 1) % (this.width * 3)) == 0){
                         i = i + padding;
                     }
                 }
@@ -279,6 +283,9 @@ public class BMP {
     private void printParsedPixelData(){
         for (int i = 0; i < this.parsedPixelData.length; i++){
             System.out.println(i + " : " + this.parsedPixelData[i][0] + ", " + this.parsedPixelData[i][1] + ", " + this.parsedPixelData[i][2]);
+            if ((i + 1) % this.width == 0){
+                System.out.println();
+            }
         }
     }
 }
