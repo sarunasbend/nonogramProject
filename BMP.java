@@ -163,7 +163,7 @@ public class BMP {
                 for (int i = 0; i < this.unparsedPixelData.length; i++){
                     for (int j = 7; j >= 0; j--){
                         validBits++;
-                        if ((unparsedPixelData[i] & (1 << j)) == 0){
+                        if ((unparsedPixelData[i] & (1 << j)) != 0){
                             parsedPixelData[index][0] = 255;
                             parsedPixelData[index][1] = 255;
                             parsedPixelData[index][2] = 255;
@@ -283,7 +283,7 @@ public class BMP {
     }
 
     //debugging method, to see if the parsed pixel data aligns with the UnparsedData
-    private void printParsedPixelData(){
+    public void printParsedPixelData(){
         for (int i = 0; i < this.parsedPixelData.length; i++){
             System.out.println(i + " : " + this.parsedPixelData[i][0] + ", " + this.parsedPixelData[i][1] + ", " + this.parsedPixelData[i][2]);
             if ((i + 1) % this.width == 0){
