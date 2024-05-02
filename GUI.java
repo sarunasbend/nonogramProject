@@ -2,11 +2,11 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import java.awt.*;
-public class GUI {
+public class GUI extends JFrame { 
     //setting the foundations for the GUI, will consider the proper implementation after the foundation
     //where the colours, and the grid will be implemented dynamically, so it can accompany as many colours
     //as required, and the grid can take as many rows and columns as required
-    private JFrame window;
+    /*private JFrame window;
     public GUI(){
         JPanel tools = new JPanel();
         tools.setBackground(Color.RED);
@@ -48,5 +48,42 @@ public class GUI {
         this.window.add(colours);
         this.window.add(buttons);
         this.window.add(nonogram);
+    }*/
+    /*private Nonogram2 gridPanel;
+    private JPanel gridJPanel;
+
+    public GUI(Nonogram2 gridPanel){
+        this.gridPanel = gridPanel;
+        setTitle("Nonogram Puzzle");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridLayout());
+        add(gridPanel.getGridPanel(), BorderLayout.CENTER);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }*/
+
+    private JPanel nonogramPanel;
+    public GUI(Nonogram nonogram){
+        this.nonogramPanel = nonogram.getNonogramPanel();
+        setTitle("NONOGRAM PUZZLE");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        add(nonogramPanel, BorderLayout.CENTER);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
+
+    /*public GUI (Grid gridPanel){
+        setSize(1000,1000);
+        this.gridPanel = gridPanel;
+        this.gridJPanel = this.gridPanel.getGridPanel();
+        this.gridJPanel.setBounds(0,200,200,400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
+        add(this.gridJPanel);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }*/
 }
