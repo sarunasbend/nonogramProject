@@ -14,6 +14,7 @@ public class Nonogram {
     private int[][] parsedPixelData; //will be used to get the solved Nonogram data
     private int[][][] solvedNonogramData; //what the nonogram should look like at the end, comparative data
     private int[][][] userNonogramData; //the user's nonogram data
+    private ArrayList<int[]> colourPalette;
     private ArrayList<ArrayList<Integer>> rowTiles; //consecutive row tiles
     private ArrayList<ArrayList<Integer>> columnTiles; //consecutive column tiles
     private int checkSum;
@@ -42,7 +43,9 @@ public class Nonogram {
         }
         setColour(255,255,0);
         initialiseNonogramPanel();
-        changeColour(255, 0, 255);
+        finishedNonogramPanel();
+        setColourPalette();
+        initialiseNonogramPanel();
     }
 
     //comparative nonogram, will be used to check whether or not the user has done it correctly and for check
@@ -79,6 +82,41 @@ public class Nonogram {
 
     private int[][][] getUserNonogramData(){
         return this.userNonogramData;
+    }
+
+    private void setColourPalette(){
+        this.colourPalette = new ArrayList<int[]>();
+        for (int i = 0; i < this.height; i++){
+            for (int j = 0; j < this.width; j++){
+                int rgb[] = new int[3];
+                if (this.colourPalette.size() == 0){
+                    rgb[0] = this.nonogramTilesPanels[i][j].getBackground().getRed();
+                    rgb[1] = this.nonogramTilesPanels[i][j].getBackground().getGreen();
+                    rgb[2] = this.nonogramTilesPanels[i][j].getBackground().getBlue();
+                    this.colourPalette.add(rgb);
+                } else {
+                    boolean found = false;
+                    int red = this.nonogramTilesPanels[i][j].getBackground().getRed();
+                    int green = this.nonogramTilesPanels[i][j].getBackground().getGreen();
+                    int blue = this.nonogramTilesPanels[i][j].getBackground().getBlue();
+                    for (int[] colours : this.colourPalette){
+                        if ((colours[0] == red) && (colours[1] == green) && (colours[2] == blue)){
+                            found = true;
+                        }
+                    }
+                    if (!found){
+                        rgb[0] = red;
+                        rgb[1] = green;
+                        rgb[2] = blue;
+                        this.colourPalette.add(rgb);
+                    }
+                }
+            }
+        }
+    }
+
+    public ArrayList<int[]> getColourPalette(){
+        return this.colourPalette;
     }
 
     private void setRowTiles(){
@@ -173,6 +211,10 @@ public class Nonogram {
         this.colour[2] = blue;
     }
 
+    public int[] getColours(){
+        return this.colour;
+    }
+
     //creates nonogram grid 
     private void initialiseNonogramPanel(){
         this.nonogramPanel = new JPanel();
@@ -191,14 +233,12 @@ public class Nonogram {
         JPanel nonogramTile = new JPanel();
         nonogramTile.setBackground(Color.WHITE);
         nonogramTile.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        int red = this.colour[0];
-        int green = this.colour[1];
-        int blue = this.colour[2];
 
-        //action listener is static, what i mean by that is that it will only change the colour first set within the action listener
-        //not sure on how to fix this
         nonogramTile.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
+                int red = getColours()[0];
+                int green = getColours()[1];
+                int blue = getColours()[2];
                 if (nonogramTile.getBackground() == Color.WHITE){
                     nonogramTile.setBackground(new Color(red, green, blue)); //will need to update the user's nonogram data as well
                 } else {

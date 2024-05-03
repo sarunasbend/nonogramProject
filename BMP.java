@@ -27,6 +27,7 @@ public class BMP {
         setPixelDataLocation();
         setUnparsedPixelData();
         setParsedPixelData();
+        createTxt();
     }
         
     //creates a txt of the all the values held in the bmp file, so its readable 
