@@ -176,9 +176,6 @@ public class GUI extends JFrame {
         this.subPanel2.setBackground(Color.CYAN);
         this.subPanel2.setBorder(BorderFactory.createLineBorder(Color.black));
         this.subPanel2.add(this.buttonsPanel);
-        
-
-
     
         getContentPane().add(this.subPanel);
         getContentPane().add(this.subPanel2);

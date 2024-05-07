@@ -8,11 +8,13 @@ import java.util.ArrayList;
 
 public class ColourButtons{
     private ArrayList<int[]> colourPalette;
+    private Nonogram nonogram;
     private JPanel colourPanel;
     private JPanel colours[];
 
-    public ColourButtons(ArrayList<int[]> colourPalette){
+    public ColourButtons(ArrayList<int[]> colourPalette, Nonogram nonogramPuzzle){
         this.colourPalette = colourPalette;
+        this.nonogram = nonogramPuzzle;
         this.colours = new JPanel[this.colourPalette.size()];
         initialiseColourButtons();
     }
@@ -37,10 +39,14 @@ public class ColourButtons{
         colourTile.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
                 //set colour of tile placed
-                colourTile.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+                setColour(red, green, blue);
             }
         });
         return colourTile;
+    }
+
+    private void setColour(int red, int green, int blue){
+        this.nonogram.setColour(red, green, blue);
     }
 
     public JPanel getColourButtonPanel(){

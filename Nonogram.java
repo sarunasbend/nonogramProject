@@ -17,6 +17,7 @@ public class Nonogram {
     private ArrayList<int[]> colourPalette;
     private ArrayList<ArrayList<Integer>> rowTiles; //consecutive row tiles
     private ArrayList<ArrayList<Integer>> columnTiles; //consecutive column tiles
+    private int validTiles; //number of non-white tiles will be used in the calculation of checksum
     private int checkSum;
     private boolean completed = false;
 
@@ -34,19 +35,14 @@ public class Nonogram {
         this.parsedPixelData = bmp.getParsedPixelData();
         setSolvedNonogramData();
         setUserNonogramData();
-        if (hardMode){
-            setHardRowTiles();
-            setHardColumnTiles();
-        } else {
-            setRowTiles();
-            setColumnTiles();
-        }
+        setRowTiles2();
         setColour(255,255,0);
         initialiseNonogramPanel();
         finishedNonogramPanel();
         setColourPalette();
-        setCheckSum();
-        System.out.println(getCheckSum());
+        initialiseNonogramPanel();
+        setValidTiles();
+        finishedNonogramPanel();
     }
 
     //comparative nonogram, will be used to check whether or not the user has done it correctly and for check
@@ -143,6 +139,41 @@ public class Nonogram {
             this.rowTiles.add(row);
         }
     }
+    private ArrayList<ArrayList<Integer[]>> rowTiles2;
+
+    //this algorithm currently does not function as intended
+    //there is an issue where it will not consider the white spaces between consecutive tiles
+    //tiles which are not black will get added to the arrayList seperately, which is very weird
+    private void setRowTiles2(){
+        this.rowTiles2 = new ArrayList<>();
+        for (int i = 0; i < this.height; i++){
+            ArrayList<Integer[]> row = new ArrayList<>();
+            for (int j = 0; j < this.width; j++){
+                Integer frgb[] = new Integer[4]; //frequency, red, green, blue 
+                frgb[1] = this.solvedNonogramData[i][j][0];
+                frgb[2] = this.solvedNonogramData[i][j][1];
+                frgb[3] = this.solvedNonogramData[i][j][2];
+                if ((row.size() == 0) && ((frgb[1] != 255) || (frgb[2] != 255) || (frgb[3] != 255))){
+                    frgb[0] = 1;
+                    row.add(frgb);
+                } else if ((row.size() != 0) && ((frgb[1] != 255) || (frgb[2] != 255) || (frgb[3] != 255))){
+                    if ((row.size() != 0) && (row.get(row.size() - 1)[1] == frgb[1]) && (row.get(row.size() - 1)[2] == frgb[2]) && (row.get(row.size() - 1)[3] == frgb[3])){
+                        frgb = row.get(row.size() - 1);
+                        frgb[0]++;
+                        row.set(row.size() - 1, frgb);
+                    } else if ((row.size() != 0) && ((row.get(row.size() - 1)[1] != frgb[1]) || (row.get(row.size() - 1)[2] != frgb[2]) || (row.get(row.size() - 1)[3] != frgb[3]))){
+                        frgb[0] = 1;
+                        row.add(frgb);
+                    }
+                }
+            }
+            this.rowTiles2.add(row);
+        }
+    }
+
+    public ArrayList<ArrayList<Integer[]>> getRowTiles2(){
+        return this.rowTiles2;
+    }
 
 
     public ArrayList<ArrayList<Integer>> getRowTiles(){
@@ -223,7 +254,7 @@ public class Nonogram {
         this.nonogramTilesPanels = new JPanel[this.height][this.width];
         for (int i = 0 ; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
-                this.nonogramTilesPanels[i][j] = initialiseNonogramTilePanel();
+                this.nonogramTilesPanels[i][j] = initialiseNonogramTilePanel(i,j);
             }
         }
         //this part is essential as the nonogram will be inverted if not added in this way.
@@ -236,11 +267,10 @@ public class Nonogram {
     }
 
     //creates a nonogram tile
-    private JPanel initialiseNonogramTilePanel(){
+    private JPanel initialiseNonogramTilePanel(int indexX, int indexY){
         JPanel nonogramTile = new JPanel();
         nonogramTile.setBackground(Color.WHITE);
         nonogramTile.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
         nonogramTile.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
                 int red = getColours()[0];
@@ -248,6 +278,7 @@ public class Nonogram {
                 int blue = getColours()[2];
                 if (nonogramTile.getBackground() == Color.WHITE){
                     nonogramTile.setBackground(new Color(red, green, blue)); //will need to update the user's nonogram data as well
+                    changeUserNonogram(indexX, indexY);
                 } else {
                     nonogramTile.setBackground(Color.WHITE);
                 }
@@ -256,9 +287,15 @@ public class Nonogram {
         return nonogramTile;
     }
 
+    private void changeUserNonogram(int indexX, int indexY){
+        this.userNonogramData[indexX][indexY][0] = this.colour[0];
+        this.userNonogramData[indexX][indexY][1] = this.colour[1];
+        this.userNonogramData[indexX][indexY][2] = this.colour[2];
+    }
+
     //method that will check the number of tiles that are incorrect, will return an integer
-    private void setCheckSum(){
-        this.checkSum = 0;
+    public void setCheckSum(){
+        this.checkSum = this.validTiles;
         for (int i = 0; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
                 int red = this.solvedNonogramData[i][j][0];
@@ -266,11 +303,12 @@ public class Nonogram {
                 int blue = this.solvedNonogramData[i][j][2];
                 if ((red == this.userNonogramData[i][j][0]) && (green == this.userNonogramData[i][j][0]) && (blue == this.userNonogramData[i][j][2])){
                     if ((red != 255) && (green != 255) && (blue != 255)) {
-                        this.checkSum++;
+                        this.checkSum--;
                     }
                 }
             }
         }
+
     }
 
     public int getCheckSum(){
@@ -295,5 +333,20 @@ public class Nonogram {
 
     public int getHeight(){
         return this.height;
+    }
+
+    private void setValidTiles(){
+        this.validTiles = 0;
+        for (int i = 0; i < this.height; i++){
+            for (int j = 0; j < this.width; j++){
+                if ((this.solvedNonogramData[i][j][0] != 255) || (this.solvedNonogramData[i][j][1] != 255) || (this.solvedNonogramData[i][j][2] != 255)){
+                    this.validTiles++;
+                }
+            }
+        }
+    }
+
+    public int getValidTiles(){
+        return this.validTiles;
     }
 }

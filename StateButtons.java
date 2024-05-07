@@ -9,11 +9,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class StateButtons {
+    private Nonogram nonogram;
     private JPanel buttonsPanel;
     private JButton checkButton;
     private JButton completeButton;
 
-    public StateButtons(){
+    public StateButtons(Nonogram nonogramPuzzle){
+        this.nonogram = nonogramPuzzle;
         initialiseStateButtons();
     }
 
@@ -33,10 +35,15 @@ public class StateButtons {
         check.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
                 //call check function in nonogram
-                System.out.println("CHECK");
+                check();
             }            
         });
         return check;
+    }
+
+    private void check(){
+        this.nonogram.setCheckSum();
+        System.out.println(this.nonogram.getCheckSum());
     }
 
     private JButton initialiseComplete(){
