@@ -45,7 +45,8 @@ public class Nonogram {
         initialiseNonogramPanel();
         finishedNonogramPanel();
         setColourPalette();
-        initialiseNonogramPanel();
+        setCheckSum();
+        System.out.println(getCheckSum());
     }
 
     //comparative nonogram, will be used to check whether or not the user has done it correctly and for check
@@ -223,6 +224,12 @@ public class Nonogram {
         for (int i = 0 ; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
                 this.nonogramTilesPanels[i][j] = initialiseNonogramTilePanel();
+            }
+        }
+        //this part is essential as the nonogram will be inverted if not added in this way.
+        //comparison will still be the same as it the tiles initialised start from the bottom most left 
+        for (int i = this.height - 1; i >= 0 ; i--){
+            for (int j = 0; j < this.width; j++){
                 this.nonogramPanel.add(this.nonogramTilesPanels[i][j]);
             }
         }
@@ -249,6 +256,27 @@ public class Nonogram {
         return nonogramTile;
     }
 
+    //method that will check the number of tiles that are incorrect, will return an integer
+    private void setCheckSum(){
+        this.checkSum = 0;
+        for (int i = 0; i < this.height; i++){
+            for (int j = 0; j < this.width; j++){
+                int red = this.solvedNonogramData[i][j][0];
+                int green = this.solvedNonogramData[i][j][1];
+                int blue = this.solvedNonogramData[i][j][2];
+                if ((red == this.userNonogramData[i][j][0]) && (green == this.userNonogramData[i][j][0]) && (blue == this.userNonogramData[i][j][2])){
+                    if ((red != 255) && (green != 255) && (blue != 255)) {
+                        this.checkSum++;
+                    }
+                }
+            }
+        }
+    }
+
+    public int getCheckSum(){
+        return this.checkSum;
+    }
+
     public JPanel getNonogramPanel(){
         return this.nonogramPanel;
     }
@@ -259,5 +287,13 @@ public class Nonogram {
                 this.nonogramTilesPanels[i][j].setBackground(new Color(this.solvedNonogramData[i][j][0],this.solvedNonogramData[i][j][1],this.solvedNonogramData[i][j][2]));
             }
         }
+    }
+
+    public int getWidth(){
+        return this.width;
+    }
+
+    public int getHeight(){
+        return this.height;
     }
 }

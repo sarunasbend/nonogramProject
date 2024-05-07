@@ -4,13 +4,11 @@ import java.util.ArrayList;
 public class Driver {
     public static void main(String[] args) throws IOException{
         
-        BMP bmp = new BMP("summer-project/testCase5.bmp"); //cannot do 16 bit-depths yet
+        BMP bmp = new BMP("summer-project/2colour_elephant.bmp"); //cannot do 16 bit-depths yet
         Nonogram puzzle = new Nonogram(bmp, false);
-        GUI temp = new GUI(puzzle);
-        ArrayList<int[]> colourList = puzzle.getColourPalette();
-
-        for (int[] rgb : colourList){
-            System.out.println(rgb[0] + ", " + rgb[1] + ", " + rgb[2]);
-        }
+        ArrayList<int[]> colourPalette = puzzle.getColourPalette();
+        ColourButtons buttons = new ColourButtons(colourPalette);
+        StateButtons check = new StateButtons();
+        GUI temp = new GUI(puzzle.getNonogramPanel(), buttons.getColourButtonPanel(), check.getButtonsPanel());
     }
 }
