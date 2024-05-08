@@ -15,16 +15,22 @@ public class Nonogram {
     private int[][][] solvedNonogramData; //what the nonogram should look like at the end, comparative data
     private int[][][] userNonogramData; //the user's nonogram data
     private ArrayList<int[]> colourPalette;
-    private ArrayList<ArrayList<Integer>> rowTiles; //consecutive row tiles
-    private ArrayList<ArrayList<Integer>> columnTiles; //consecutive column tiles
+    private ArrayList<ArrayList<Integer[]>> rowTiles; //consecutive row tiles
+    private ArrayList<ArrayList<Integer[]>> columnTiles; //consecutive column tiles
     private int validTiles; //number of non-white tiles will be used in the calculation of checksum
     private int checkSum;
     private boolean completed = false;
+    private int widthOfRowNumbers;
+    private int widthOfColumnNumbers;
 
     //gui attributes
     private int colour[];
     private JPanel nonogramPanel;
     private JPanel[][] nonogramTilesPanels;
+    private JPanel leftGrid;
+    private JLabel[] leftNummbers;
+    private JPanel bottomGrid;
+    private JLabel[][] bottomNumbers;
 
     //hardmode will be determined by the home menu
     public Nonogram(BMP bmp, boolean hardMode){
@@ -35,8 +41,10 @@ public class Nonogram {
         this.parsedPixelData = bmp.getParsedPixelData();
         setSolvedNonogramData();
         setUserNonogramData();
-        setRowTiles2();
-        setColour(255,255,0);
+        setRowTiles();
+        setColumnTiles();
+        setWidthOfRowNumbers();
+        setWidthOfColumnNumbers();
         initialiseNonogramPanel();
         finishedNonogramPanel();
         setColourPalette();
@@ -118,65 +126,35 @@ public class Nonogram {
 
     private void setRowTiles(){
         this.rowTiles = new ArrayList<>();
-        int tilesOnRow;
         for (int i = 0; i < this.height; i++){
-            ArrayList<Integer> row = new ArrayList<>();
-            tilesOnRow = 0;
+            ArrayList<Integer[]> row = new ArrayList<>();
+            int index = 0;
             for (int j = 0; j < this.width; j++){
-                int red = this.solvedNonogramData[i][j][0];
-                int green = this.solvedNonogramData[i][j][1];
-                int blue = this.solvedNonogramData[i][j][2];
-                if ((red != 255) || (green != 255) || (blue != 255)){
-                    tilesOnRow++;
-                } else if ((tilesOnRow != 0)){
-                    row.add(tilesOnRow);
-                    tilesOnRow = 0;
-                } 
-                if ((j == this.width - 1) && (tilesOnRow != 0)){
-                    row.add(tilesOnRow);
+                Integer frgb[] = new Integer[4];
+                frgb[1] = this.solvedNonogramData[i][j][0]; //red
+                frgb[2] = this.solvedNonogramData[i][j][1]; //green
+                frgb[3] = this.solvedNonogramData[i][j][2]; //blue
+                if (row.size() == 0){
+                    frgb[0] = 1;
+                    row.add(frgb);
+                } else {
+                    if ((this.solvedNonogramData[i][j - 1][0] == frgb[1]) && (this.solvedNonogramData[i][j -1][1] == frgb[2]) && (this.solvedNonogramData[i][j - 1][2] == frgb[3])){
+                        frgb = row.get(index);
+                        frgb[0] = frgb[0] + 1;
+                        row.set(index, frgb);
+                    } else {
+                        frgb[0] = 1;
+                        row.add(frgb);
+                        index++;
+                    }
                 }
             }
             this.rowTiles.add(row);
         }
     }
-    private ArrayList<ArrayList<Integer[]>> rowTiles2;
-
-    //this algorithm currently does not function as intended
-    //there is an issue where it will not consider the white spaces between consecutive tiles
-    //tiles which are not black will get added to the arrayList seperately, which is very weird
-    private void setRowTiles2(){
-        this.rowTiles2 = new ArrayList<>();
-        for (int i = 0; i < this.height; i++){
-            ArrayList<Integer[]> row = new ArrayList<>();
-            for (int j = 0; j < this.width; j++){
-                Integer frgb[] = new Integer[4]; //frequency, red, green, blue 
-                frgb[1] = this.solvedNonogramData[i][j][0];
-                frgb[2] = this.solvedNonogramData[i][j][1];
-                frgb[3] = this.solvedNonogramData[i][j][2];
-                if ((row.size() == 0) && ((frgb[1] != 255) || (frgb[2] != 255) || (frgb[3] != 255))){
-                    frgb[0] = 1;
-                    row.add(frgb);
-                } else if ((row.size() != 0) && ((frgb[1] != 255) || (frgb[2] != 255) || (frgb[3] != 255))){
-                    if ((row.size() != 0) && (row.get(row.size() - 1)[1] == frgb[1]) && (row.get(row.size() - 1)[2] == frgb[2]) && (row.get(row.size() - 1)[3] == frgb[3])){
-                        frgb = row.get(row.size() - 1);
-                        frgb[0]++;
-                        row.set(row.size() - 1, frgb);
-                    } else if ((row.size() != 0) && ((row.get(row.size() - 1)[1] != frgb[1]) || (row.get(row.size() - 1)[2] != frgb[2]) || (row.get(row.size() - 1)[3] != frgb[3]))){
-                        frgb[0] = 1;
-                        row.add(frgb);
-                    }
-                }
-            }
-            this.rowTiles2.add(row);
-        }
-    }
-
-    public ArrayList<ArrayList<Integer[]>> getRowTiles2(){
-        return this.rowTiles2;
-    }
 
 
-    public ArrayList<ArrayList<Integer>> getRowTiles(){
+    public ArrayList<ArrayList<Integer[]>> getRowTiles(){
         return this.rowTiles;
     }
 
@@ -185,36 +163,41 @@ public class Nonogram {
 
     }
 
-    public ArrayList<ArrayList<Integer>> getHardRowTiles(){
+    public ArrayList<ArrayList<Integer[]>> getHardRowTiles(){
         return this.rowTiles;
     }
 
     //calculates the number of coloured tiles (anything but white) in the given column
     private void setColumnTiles(){
         this.columnTiles = new ArrayList<>();
-        int tilesOnColumn;
         for (int i = 0; i < this.width; i++){
-            ArrayList<Integer> column = new ArrayList<>();
-            tilesOnColumn = 0;
+            ArrayList<Integer[]> column = new ArrayList<>();
+            int index = 0;
             for (int j = 0; j < this.height; j++){
-                int red = this.solvedNonogramData[j][i][0];
-                int green = this.solvedNonogramData[j][i][1];
-                int blue = this.solvedNonogramData[j][i][2];
-                if ((red != 255) || (green != 255) || (blue != 255)){
-                    tilesOnColumn++;
-                } else if (tilesOnColumn != 0){
-                    column.add(tilesOnColumn);
-                    tilesOnColumn = 0;
-                }
-                if ((j == this.height - 1) && (tilesOnColumn != 0)){
-                    column.add(tilesOnColumn);
+                Integer frgb[] = new Integer[4];
+                frgb[1] = this.solvedNonogramData[j][i][0];
+                frgb[2] = this.solvedNonogramData[j][i][1];
+                frgb[3] = this.solvedNonogramData[j][i][2];
+                if (column.size() == 0){
+                    frgb[0] = 1;
+                    column.add(frgb);
+                } else {
+                    if ((this.solvedNonogramData[j - 1][i][0] == frgb[1]) && (this.solvedNonogramData[j - 1][i][1] == frgb[2]) && (this.solvedNonogramData[j - 1][i][2] == frgb[3])){
+                        frgb = column.get(index);
+                        frgb[0]++;
+                        column.set(index, frgb);
+                    } else {
+                        frgb[0] = 1;
+                        column.add(frgb);
+                        index++;
+                    }
                 }
             }
             this.columnTiles.add(column);
         }
     }
 
-    public ArrayList<ArrayList<Integer>> getColumnTiles(){
+    public ArrayList<ArrayList<Integer[]>> getColumnTiles(){
         return this.columnTiles;
     }
 
@@ -222,10 +205,48 @@ public class Nonogram {
 
     }
 
-    public ArrayList<ArrayList<Integer>> getHardColumnTiles(){
+    public ArrayList<ArrayList<Integer[]>> getHardColumnTiles(){
         return this.columnTiles;
     }
 
+    //to allow for the numbers on the side to be dynamically placed, we need to know the number of max numbers per row
+    private void setWidthOfRowNumbers(){
+        int max = 0;
+        for (ArrayList<Integer[]> row : this.rowTiles){
+            int temp = 0;
+            for (Integer[] number : row){
+                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
+                    temp++;
+                }
+            }
+            if (temp > max){
+                max = temp;
+            }
+        }
+        this.widthOfRowNumbers = max;
+    }
+
+    public int getWidthOfRowNumbers(){
+        return this.widthOfRowNumbers;
+    }
+
+    private void setWidthOfColumnNumbers(){
+        int max = 0;
+        for (ArrayList<Integer[]> column : this.columnTiles){
+            int temp = 0;
+            for (Integer[] number : column){
+                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
+                    temp++;
+                }
+            }
+            if (temp > max){max = temp;}
+        }
+        this.widthOfColumnNumbers = max;
+    }
+
+    public int getWidthOfColumnNumbers(){
+        return this.widthOfColumnNumbers;
+    }
     //GUI section of the class
 
     //initial colour of the tile that will be placed
@@ -287,6 +308,19 @@ public class Nonogram {
         return nonogramTile;
     }
 
+    private void initaliseLeftGrid(){
+        this.leftGrid = new JPanel();
+        this.leftGrid.setLayout(new GridLayout(this.height, getWidthOfRowNumbers()));
+        this.leftNummbers = new JLabel[20];
+        for (ArrayList<Integer[]> row : this.rowTiles){
+            for (Integer[] number : row){
+                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
+                    
+                }
+            }
+        }
+    }
+    
     private void changeUserNonogram(int indexX, int indexY){
         this.userNonogramData[indexX][indexY][0] = this.colour[0];
         this.userNonogramData[indexX][indexY][1] = this.colour[1];
@@ -349,4 +383,6 @@ public class Nonogram {
     public int getValidTiles(){
         return this.validTiles;
     }
+
+
 }

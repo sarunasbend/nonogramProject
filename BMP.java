@@ -151,8 +151,8 @@ public class BMP {
         switch (this.bitsPerPixel) {
             case 1:
                 //a byte represents 8 pixels
-                //white is 0
-                //black is 1
+                //white is 1
+                //black is 0
                 if ((this.width) % 8 == 0){
                     bytesTakenByRow = ((this.width) / 8);
                 } else {
