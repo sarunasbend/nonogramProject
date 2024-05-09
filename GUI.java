@@ -152,19 +152,26 @@ public class GUI extends JFrame {
     private JPanel colourButtonsPanel; //colour elements
     private JPanel subPanel2;
     private JPanel buttonsPanel;
+    private JPanel leftGridPanel;
+    private JPanel subPanel3;
+    private JPanel bottomGridPanel;
+    private JPanel subPanel4;
 
-    public GUI(JPanel nonogramPanel, JPanel colourButtonsPanel, JPanel buttonsPanel){
+    public GUI(JPanel nonogramPanel, JPanel colourButtonsPanel, JPanel buttonsPanel, JPanel leftGridPanel, JPanel bottomGridPanel){
         this.nonogramPanel = nonogramPanel;
         this.colourButtonsPanel = colourButtonsPanel;
         this.buttonsPanel = buttonsPanel;
+        this.leftGridPanel = leftGridPanel;
+        this.bottomGridPanel = bottomGridPanel;
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
         setLayout(null);
         this.mainPanel = new JPanel(new BorderLayout());
-        this.mainPanel.setBounds(200,0,800,700);
+        this.mainPanel.setBounds(200,0,400,700);
         this.mainPanel.setBackground(Color.BLUE);
         this.mainPanel.add(this.nonogramPanel, BorderLayout.CENTER);
-
+        
         this.subPanel = new JPanel(new BorderLayout());
         this.subPanel.setBounds(0,0,200,400);
         this.subPanel.setBackground(Color.BLACK);
@@ -176,11 +183,26 @@ public class GUI extends JFrame {
         this.subPanel2.setBackground(Color.CYAN);
         this.subPanel2.setBorder(BorderFactory.createLineBorder(Color.black));
         this.subPanel2.add(this.buttonsPanel);
+
+        this.subPanel3 = new JPanel(new BorderLayout());
+        this.subPanel3.setBounds(700,0, 200, 700);
+        this.subPanel3.setBackground(Color.GREEN);
+        this.subPanel3.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        this.subPanel3.add(this.leftGridPanel);
+
+        this.subPanel4 = new JPanel(new BorderLayout());
+        this.subPanel4.setBounds(200,700,400,100);
+        this.subPanel4.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        this.subPanel4.add(this.bottomGridPanel);
+
     
         getContentPane().add(this.subPanel);
         getContentPane().add(this.subPanel2);
+        getContentPane().add(this.subPanel3);
+        getContentPane().add(this.subPanel4);
+
         getContentPane().add(this.mainPanel);
         setVisible(true);
-        setResizable(false);
+        setResizable(true);
     }
 }

@@ -28,7 +28,7 @@ public class Nonogram {
     private JPanel nonogramPanel;
     private JPanel[][] nonogramTilesPanels;
     private JPanel leftGrid;
-    private JLabel[] leftNummbers;
+    private JLabel[][] leftNummbers;
     private JPanel bottomGrid;
     private JLabel[][] bottomNumbers;
 
@@ -41,15 +41,23 @@ public class Nonogram {
         this.parsedPixelData = bmp.getParsedPixelData();
         setSolvedNonogramData();
         setUserNonogramData();
+
         setRowTiles();
-        setColumnTiles();
         setWidthOfRowNumbers();
+        initaliseLeftGrid();
+
+        setColumnTiles();
         setWidthOfColumnNumbers();
+        initialiseBottomGrid();
+
         initialiseNonogramPanel();
         finishedNonogramPanel();
+
         setColourPalette();
+
         initialiseNonogramPanel();
         setValidTiles();
+
         finishedNonogramPanel();
     }
 
@@ -308,17 +316,71 @@ public class Nonogram {
         return nonogramTile;
     }
 
+    //creates the left grid for the numbers 
     private void initaliseLeftGrid(){
         this.leftGrid = new JPanel();
         this.leftGrid.setLayout(new GridLayout(this.height, getWidthOfRowNumbers()));
-        this.leftNummbers = new JLabel[20];
+        this.leftNummbers = new JLabel[this.height][getWidthOfRowNumbers()];
+        int indexX = 0;
         for (ArrayList<Integer[]> row : this.rowTiles){
+            int indexY = 0;
             for (Integer[] number : row){
                 if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
-                    
+                    this.leftNummbers[indexX][indexY] = new JLabel(Integer.toString(number[0]));
+                    this.leftNummbers[indexX][indexY].setForeground(new Color(number[1], number[2], number[3]));
+                    indexY++;
                 }
             }
+            if (indexY < getWidthOfRowNumbers()){
+                for (;indexY < getWidthOfRowNumbers(); indexY++){
+                    this.leftNummbers[indexX][indexY] = new JLabel();
+                    //this.leftGrid.add(this.leftNummbers[indexX][indexY]);
+                }
+            }
+            indexX++;
         }
+        for (indexX = this.height - 1; indexX >= 0; indexX--){
+            for (int indexY = getWidthOfRowNumbers() - 1; indexY >= 0; indexY--){
+                this.leftGrid.add(this.leftNummbers[indexX][indexY]);
+            }
+        }
+    }
+
+    public JPanel getLeftGridPanel(){
+        return this.leftGrid;
+    }
+
+    //think of a better name
+    private void initialiseBottomGrid(){
+        this.bottomGrid = new JPanel();
+        this.bottomGrid.setLayout(new GridLayout(getWidthOfColumnNumbers(), this.width));
+        this.bottomNumbers = new JLabel[getWidthOfColumnNumbers()][this.width];
+        int indexY = 0;
+        for (ArrayList<Integer[]> column : this.columnTiles){
+            int indexX = 0;
+            for (Integer[] number : column){
+                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
+                    this.bottomNumbers[indexX][indexY] = new JLabel(Integer.toString(number[0]));
+                    this.bottomNumbers[indexX][indexY].setForeground(new Color(number[1], number[2], number[3]));
+                    indexX++;
+                }
+            }
+            if (indexX < getWidthOfColumnNumbers()){
+                for (;indexX < getWidthOfColumnNumbers(); indexX++){
+                    this.bottomNumbers[indexX][indexY] = new JLabel();
+                }
+            }
+            indexY++;
+        }
+        for (int indexX = 0; indexX < getWidthOfColumnNumbers(); indexX++){
+            for (indexY = 0; indexY < this.width; indexY++){
+                this.bottomGrid.add(this.bottomNumbers[indexX][indexY]);
+            }       
+        }
+    }
+
+    public JPanel getBottomGridPanel(){
+        return this.bottomGrid;
     }
     
     private void changeUserNonogram(int indexX, int indexY){
