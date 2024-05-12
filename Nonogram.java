@@ -31,6 +31,7 @@ public class Nonogram {
     private JLabel[][] leftNummbers;
     private JPanel bottomGrid;
     private JLabel[][] bottomNumbers;
+    private Font mainFont = new Font("Impact", Font.PLAIN, 8); //font of the labels and buttons
 
     //hardmode will be determined by the home menu
     public Nonogram(BMP bmp, boolean hardMode){
@@ -51,18 +52,19 @@ public class Nonogram {
         initialiseBottomGrid();
 
         initialiseNonogramPanel();
-        finishedNonogramPanel();
+        completeNonogramPanel();
 
         setColourPalette();
+        setColour(0, 0, 0);
 
         initialiseNonogramPanel();
         setValidTiles();
 
-        finishedNonogramPanel();
+        setCheckSum();
     }
 
     //comparative nonogram, will be used to check whether or not the user has done it correctly and for check
-    private void setSolvedNonogramData(){
+    public void setSolvedNonogramData(){
         this.solvedNonogramData = new int[this.height][this.width][3]; //row, columns, rgb colours
         int index = 0;
         //nonogram start from the leftmost and bottom-most tile
@@ -72,6 +74,16 @@ public class Nonogram {
                 this.solvedNonogramData[i][j][1] = this.parsedPixelData[index][1]; //green
                 this.solvedNonogramData[i][j][2] = this.parsedPixelData[index][2]; //blue
                 index++;
+            }
+        }
+    }
+
+    public void showIncorrectTiles(){
+        for (int i = 0; i < this.height; i++){
+            for (int j = 0; j < this.width; j++){
+                if ((this.userNonogramData[i][j][0] != this.solvedNonogramData[i][j][0]) || (this.userNonogramData[i][j][1] != this.solvedNonogramData[i][j][1]) || (this.userNonogramData[i][j][2] != this.solvedNonogramData[i][j][2])){
+                    this.nonogramTilesPanels[i][j].setBackground(new Color(255, 0, 0));
+                }
             }
         }
     }
@@ -143,12 +155,12 @@ public class Nonogram {
                 frgb[2] = this.solvedNonogramData[i][j][1]; //green
                 frgb[3] = this.solvedNonogramData[i][j][2]; //blue
                 if (row.size() == 0){
-                    frgb[0] = 1;
+                    frgb[0] = 1; //frequency
                     row.add(frgb);
                 } else {
                     if ((this.solvedNonogramData[i][j - 1][0] == frgb[1]) && (this.solvedNonogramData[i][j -1][1] == frgb[2]) && (this.solvedNonogramData[i][j - 1][2] == frgb[3])){
                         frgb = row.get(index);
-                        frgb[0] = frgb[0] + 1;
+                        frgb[0] = frgb[0] + 1; //increment frequency
                         row.set(index, frgb);
                     } else {
                         frgb[0] = 1;
@@ -163,15 +175,6 @@ public class Nonogram {
 
 
     public ArrayList<ArrayList<Integer[]>> getRowTiles(){
-        return this.rowTiles;
-    }
-
-    //hardmode 
-    private void setHardRowTiles(){
-
-    }
-
-    public ArrayList<ArrayList<Integer[]>> getHardRowTiles(){
         return this.rowTiles;
     }
 
@@ -206,14 +209,6 @@ public class Nonogram {
     }
 
     public ArrayList<ArrayList<Integer[]>> getColumnTiles(){
-        return this.columnTiles;
-    }
-
-    private void setHardColumnTiles(){
-
-    }
-
-    public ArrayList<ArrayList<Integer[]>> getHardColumnTiles(){
         return this.columnTiles;
     }
 
@@ -279,7 +274,8 @@ public class Nonogram {
     //creates nonogram grid 
     private void initialiseNonogramPanel(){
         this.nonogramPanel = new JPanel();
-        this.nonogramPanel.setLayout(new GridLayout(this.height, this.width)); //experimenting to see how this will turn out
+        this.nonogramPanel.setLayout(new GridLayout(this.height, this.width));
+        this.nonogramPanel.setBackground(new Color(255, 213, 0));
         this.nonogramTilesPanels = new JPanel[this.height][this.width];
         for (int i = 0 ; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
@@ -301,7 +297,7 @@ public class Nonogram {
         nonogramTile.setBackground(Color.WHITE);
         nonogramTile.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         nonogramTile.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent event){
+            public void mousePressed(MouseEvent event){
                 int red = getColours()[0];
                 int green = getColours()[1];
                 int blue = getColours()[2];
@@ -320,20 +316,25 @@ public class Nonogram {
     private void initaliseLeftGrid(){
         this.leftGrid = new JPanel();
         this.leftGrid.setLayout(new GridLayout(this.height, getWidthOfRowNumbers()));
-        this.leftNummbers = new JLabel[this.height][getWidthOfRowNumbers()];
+        this.leftGrid.setBackground(new Color(255, 213, 0));
+        this.leftNummbers = new JLabel[this.height + 1][getWidthOfRowNumbers()];
         int indexX = 0;
         for (ArrayList<Integer[]> row : this.rowTiles){
             int indexY = 0;
             for (Integer[] number : row){
                 if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
                     this.leftNummbers[indexX][indexY] = new JLabel(Integer.toString(number[0]));
+                    this.leftNummbers[indexX][indexY].setFont(this.mainFont);
                     this.leftNummbers[indexX][indexY].setForeground(new Color(number[1], number[2], number[3]));
+                    //this.leftNummbers[indexX][indexY].setBackground(new Color(255, 213, 0));
+
                     indexY++;
                 }
             }
             if (indexY < getWidthOfRowNumbers()){
                 for (;indexY < getWidthOfRowNumbers(); indexY++){
                     this.leftNummbers[indexX][indexY] = new JLabel();
+                    this.leftNummbers[indexX][indexY].setBackground(new Color(255, 213, 0));
                     //this.leftGrid.add(this.leftNummbers[indexX][indexY]);
                 }
             }
@@ -354,6 +355,7 @@ public class Nonogram {
     private void initialiseBottomGrid(){
         this.bottomGrid = new JPanel();
         this.bottomGrid.setLayout(new GridLayout(getWidthOfColumnNumbers(), this.width));
+        this.bottomGrid.setBackground(new Color(255, 213, 0));
         this.bottomNumbers = new JLabel[getWidthOfColumnNumbers()][this.width];
         int indexY = 0;
         for (ArrayList<Integer[]> column : this.columnTiles){
@@ -361,19 +363,22 @@ public class Nonogram {
             for (Integer[] number : column){
                 if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
                     this.bottomNumbers[indexX][indexY] = new JLabel(Integer.toString(number[0]));
+                    this.bottomNumbers[indexX][indexY].setFont(this.mainFont);
                     this.bottomNumbers[indexX][indexY].setForeground(new Color(number[1], number[2], number[3]));
+                    //this.bottomNumbers[indexX][indexY].setBackground(new Color(255, 213, 0));
                     indexX++;
                 }
             }
             if (indexX < getWidthOfColumnNumbers()){
                 for (;indexX < getWidthOfColumnNumbers(); indexX++){
                     this.bottomNumbers[indexX][indexY] = new JLabel();
+                    //this.bottomNumbers[indexX][indexY].setBackground(new Color(255, 213, 0));
                 }
             }
             indexY++;
         }
-        for (int indexX = 0; indexX < getWidthOfColumnNumbers(); indexX++){
-            for (indexY = 0; indexY < this.width; indexY++){
+        for (int indexX = getWidthOfColumnNumbers() - 1; indexX >= 0; indexX--){
+            for (indexY = this.width - 1; indexY >= 0; indexY--){
                 this.bottomGrid.add(this.bottomNumbers[indexX][indexY]);
             }       
         }
@@ -389,7 +394,7 @@ public class Nonogram {
         this.userNonogramData[indexX][indexY][2] = this.colour[2];
     }
 
-    //method that will check the number of tiles that are incorrect, will return an integer
+    //method that will return the number of remaining tiles that the user needs to place
     public void setCheckSum(){
         this.checkSum = this.validTiles;
         for (int i = 0; i < this.height; i++){
@@ -415,13 +420,14 @@ public class Nonogram {
         return this.nonogramPanel;
     }
 
-    private void finishedNonogramPanel(){
+    public void completeNonogramPanel(){
         for (int i = 0; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
                 this.nonogramTilesPanels[i][j].setBackground(new Color(this.solvedNonogramData[i][j][0],this.solvedNonogramData[i][j][1],this.solvedNonogramData[i][j][2]));
             }
         }
     }
+
 
     public int getWidth(){
         return this.width;
@@ -445,6 +451,4 @@ public class Nonogram {
     public int getValidTiles(){
         return this.validTiles;
     }
-
-
 }

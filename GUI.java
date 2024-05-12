@@ -168,7 +168,7 @@ public class GUI extends JFrame {
         setSize(1200, 800);
         setLayout(null);
         this.mainPanel = new JPanel(new BorderLayout());
-        this.mainPanel.setBounds(200,0,400,700);
+        this.mainPanel.setBounds(400,0,800,600);
         this.mainPanel.setBackground(Color.BLUE);
         this.mainPanel.add(this.nonogramPanel, BorderLayout.CENTER);
         
@@ -182,18 +182,18 @@ public class GUI extends JFrame {
         this.subPanel2.setBounds(0,400, 200, 400);
         this.subPanel2.setBackground(Color.CYAN);
         this.subPanel2.setBorder(BorderFactory.createLineBorder(Color.black));
-        this.subPanel2.add(this.buttonsPanel);
+        this.subPanel2.add(this.buttonsPanel, BorderLayout.CENTER);
 
         this.subPanel3 = new JPanel(new BorderLayout());
-        this.subPanel3.setBounds(700,0, 200, 700);
+        this.subPanel3.setBounds(200,0, 200, 600);
         this.subPanel3.setBackground(Color.GREEN);
-        this.subPanel3.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        this.subPanel3.add(this.leftGridPanel);
+        //this.subPanel3.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        this.subPanel3.add(this.leftGridPanel, BorderLayout.CENTER);
 
         this.subPanel4 = new JPanel(new BorderLayout());
-        this.subPanel4.setBounds(200,700,400,100);
-        this.subPanel4.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        this.subPanel4.add(this.bottomGridPanel);
+        this.subPanel4.setBounds(410,600,800,200);
+        //this.subPanel4.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        this.subPanel4.add(this.bottomGridPanel, BorderLayout.CENTER);
 
     
         getContentPane().add(this.subPanel);
