@@ -61,7 +61,7 @@ public class GUI2 extends JFrame {
     }
 
     private void initMainFrame(){
-        ImagePanel bg = new ImagePanel("guiImages/19.png");
+        ImagePanel bg = new ImagePanel("guiImages/frameMain.png");
         setContentPane(bg);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);

@@ -37,7 +37,7 @@ public class StateButtons {
     }
 
     private JButton initialiseCheck(){
-        ImageIcon checkImage = new ImageIcon("guiImages/check2.png");
+        ImageIcon checkImage = new ImageIcon("guiImages/check.png");
         JButton check = new JButton(checkImage);
         check.setBackground(new Color(255, 213, 0));
 
@@ -55,7 +55,7 @@ public class StateButtons {
     }
 
     private JButton initialiseComplete(){
-        ImageIcon completeImage = new ImageIcon("guiImages/complete2.png");
+        ImageIcon completeImage = new ImageIcon("guiImages/complete.png");
         JButton complete = new JButton(completeImage);
         complete.setBackground(new Color(255,213,0));
         //action listener detects when button was pressed
