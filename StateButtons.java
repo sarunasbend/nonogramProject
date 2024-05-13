@@ -64,7 +64,12 @@ public class StateButtons {
             public void mouseClicked(MouseEvent event){
                 if (timesPressed == 0){
                     //shows the incorrect/missing tiles within the user's nonogram
-                    showIncorrectTiles();
+                    int winner = showIncorrectTiles();
+                    if (winner == 0){
+                        winnerCheckSum();
+                    } else {
+                        loserCheckSum();
+                    }
                     timesPressed++;
                 } else if (timesPressed == 1){
                     //complete the puzzle, filling in remaining remaining tiles in correct position and colour
@@ -75,13 +80,28 @@ public class StateButtons {
         return complete;
     }
 
-    private void showIncorrectTiles(){
-        this.nonogram.showIncorrectTiles();
+    private int showIncorrectTiles(){
+        return this.nonogram.showIncorrectTiles();
     }
 
     private void showSolvedNonogram(){
         this.nonogram.completeNonogramPanel();
     }
+
+    private void winnerCheckSum(){
+        Font winnerFont = new Font("IMPACT", Font.PLAIN, 15);
+        this.checkSum.setFont(winnerFont);
+        this.checkSum.setForeground(new Color(0,0,255));
+        this.checkSum.setText("WINNER");
+    }
+
+    private void loserCheckSum(){
+        Font loserFont = new Font("IMPACT", Font.PLAIN, 20);
+        this.checkSum.setFont(loserFont);
+        this.checkSum.setForeground(new Color(255, 0, 0));
+        this.checkSum.setText("LOSER");
+    }
+
     public JPanel getButtonsPanel(){
         return this.buttonsPanel;
     }

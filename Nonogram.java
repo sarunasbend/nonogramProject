@@ -78,14 +78,19 @@ public class Nonogram {
         }
     }
 
-    public void showIncorrectTiles(){
+    //will show any incorrect/missing tiles, and will return the number of incorrect tiles
+    //winning condition is determined by returning 0 when called
+    public int showIncorrectTiles(){
+        int count = 0;
         for (int i = 0; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
                 if ((this.userNonogramData[i][j][0] != this.solvedNonogramData[i][j][0]) || (this.userNonogramData[i][j][1] != this.solvedNonogramData[i][j][1]) || (this.userNonogramData[i][j][2] != this.solvedNonogramData[i][j][2])){
                     this.nonogramTilesPanels[i][j].setBackground(new Color(255, 0, 0));
+                    count++;
                 }
             }
         }
+        return count;
     }
 
     private int[][][] getSolvedNonogramData(){
