@@ -10,7 +10,7 @@ public class Driver {
         ArrayList<int[]> colourPalette = puzzle.getColourPalette();
         ColourButtons buttons = new ColourButtons(colourPalette, puzzle);
         StateButtons check = new StateButtons(puzzle);
-        GUI2 temp = new GUI2(puzzle.getNonogramPanel(), buttons.getColourButtonPanel(), check.getButtonsPanel(), puzzle.getLeftGridPanel(), puzzle.getBottomGridPanel(), check.getCheckSumLabel());
+        GUI temp = new GUI(puzzle.getNonogramPanel(), buttons.getColourButtonPanel(), check.getButtonsPanel(), puzzle.getLeftGridPanel(), puzzle.getBottomGridPanel(), check.getCheckSumLabel());
         ArrayList<ArrayList<Integer[]>> yes = puzzle.getColumnTiles();
     }
 }

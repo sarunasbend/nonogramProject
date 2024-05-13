@@ -6,27 +6,8 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
-//this is how you can change the background
-class ImagePanel extends JPanel {
-    private BufferedImage bgImage;
-    
-    public ImagePanel(String imagePath) {
-        try {
-            bgImage = ImageIO.read(new File(imagePath));
-        } catch (IOException event){
-            event.printStackTrace();
-        }
-    }
-
-    protected void paintComponent(Graphics g){
-        super.paintComponent(g);
-        if (bgImage != null){
-            g.drawImage(bgImage, 0, 0, getWidth(), getHeight(), this);
-        }
-    }
-}
 //inherited jframe class
-public class GUI2 extends JFrame {
+public class GUI extends JFrame {
     private JPanel mainPanel; //will store nonogram, seperate to allow for customisation to the panels seperately
     private JPanel nonogramPanel; //nonogram puzzle itself
 
@@ -44,7 +25,7 @@ public class GUI2 extends JFrame {
 
     private JLabel checkSumLabel; //number of correctly placed tiles (will only show if checked)
 
-    public GUI2(JPanel nonogramPanel, JPanel colourButtonsPanel, JPanel buttonsPanel, JPanel leftNumbersPanel, JPanel topNumbersPanel, JLabel checkSumLabel){
+    public GUI(JPanel nonogramPanel, JPanel colourButtonsPanel, JPanel buttonsPanel, JPanel leftNumbersPanel, JPanel topNumbersPanel, JLabel checkSumLabel){
         this.checkSumLabel = checkSumLabel;
         this.nonogramPanel = nonogramPanel;
         this.colourButtonsPanel = colourButtonsPanel;
@@ -61,7 +42,7 @@ public class GUI2 extends JFrame {
     }
 
     private void initMainFrame(){
-        ImagePanel bg = new ImagePanel("guiImages/frameMain.png");
+        FrameImage bg = new FrameImage("guiImages/frameMain.png");
         setContentPane(bg);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
