@@ -1,18 +1,22 @@
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Driver {
     public static void main(String[] args) throws IOException{
-        /*HomeGUI home = new HomeGUI();
-        while ((home.validPuzzle() == false)){
-        }*/
-        BMP bmp = new BMP("puzzleImages/square.bmp"); //cannot do 16 bit-depths yet
-        //home.closeHomeGUI();
+        HomeGUI homeGUI = new HomeGUI();
+        while (!homeGUI.validPuzzle()){
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException event){
+                event.printStackTrace();
+            }
+        }
+        BMP bmp = new BMP("puzzleImages/" + homeGUI.getDropDownMenuSelected()); //cannot do 16 bit-depths yet
+        homeGUI.closeHomeGUI();
         Nonogram puzzle = new Nonogram(bmp, false);
         ArrayList<int[]> colourPalette = puzzle.getColourPalette();
         ColourButtons buttons = new ColourButtons(colourPalette, puzzle);
         StateButtons check = new StateButtons(puzzle);
-        GUI temp = new GUI(puzzle.getNonogramPanel(), buttons.getColourButtonPanel(), check.getButtonsPanel(), puzzle.getLeftGridPanel(), puzzle.getBottomGridPanel(), check.getCheckSumLabel());
+        GUI mainGUI = new GUI(puzzle.getNonogramPanel(), buttons.getColourButtonPanel(), check.getButtonsPanel(), puzzle.getLeftGridPanel(), puzzle.getBottomGridPanel(), check.getCheckSumLabel());
     }
 }

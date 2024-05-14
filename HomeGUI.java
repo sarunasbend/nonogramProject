@@ -4,7 +4,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.CloseAction;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ public class HomeGUI extends JFrame {
     
     public HomeGUI(){
         this.files = new FileReader();
-        initTemp();
         initPlayButton();
         initDropDownMenu();
         initMainPanel();
@@ -59,7 +57,7 @@ public class HomeGUI extends JFrame {
     }
 
     private void initMainFrame(){
-        FrameImage backgroundImage = new FrameImage("guiImages/home.png");
+        FrameImage backgroundImage = new FrameImage("guiImages/home3.png");
         setContentPane(backgroundImage);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
@@ -68,32 +66,26 @@ public class HomeGUI extends JFrame {
         setVisible(true);
 
         getContentPane().add(this.mainPanel);
-        getContentPane().add(this.temp);
         getContentPane().add(this.playButton);
     }
 
     private void initMainPanel(){
         this.mainPanel = new JPanel(new BorderLayout());
-        this.mainPanel.setBounds(200,400,200,50);
-        this.mainPanel.setBackground(new Color(255, 255, 0));
+        this.mainPanel.setBounds(150,500,300,50);
+        this.mainPanel.setBackground(new Color(255, 213, 0));
         this.mainPanel.add(this.dropDownPanel);
     }
 
+    
     private void initDropDownMenu(){
         this.dropDownPanel = new JComboBox<>(this.files.getPuzzleNames());
     }
 
-    //TEMPORARY PANEL
-    private void initTemp(){
-        this.temp = new JPanel(new BorderLayout());
-        this.temp.setBounds(200, 150, 200, 200);
-        this.temp.setBackground(new Color(255, 0, 0));
-    }
-
     private void initPlayButton(){
-        this.playButton = new JButton("PLAY");
-        this.playButton.setBackground(new Color(0,0,255));
-        this.playButton.setBounds(200, 500, 200, 100);
+        ImageIcon playImage = new ImageIcon("guiImages/play.png");
+        this.playButton = new JButton(playImage);
+        this.playButton.setBackground(new Color(255,213,0));
+        this.playButton.setBounds(150, 600, 300, 50);
         this.playButton.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
                 getDropDownMenuSelected();
@@ -101,18 +93,20 @@ public class HomeGUI extends JFrame {
             }
         });
     }
+
+    //puzzle has been selected, called when the button is pressed
     private void setValidPuzzle(){
         this.validPuzzle = true;
     }
 
+    //whether or not a puzzle has been selected
     public boolean validPuzzle(){
         return this.validPuzzle;
     }
 
-    //weird method type
+    //returns the selected puzzle from the drop down menu
     public String getDropDownMenuSelected(){
-        System.out.println((String)(this.dropDownPanel.getSelectedItem()));
-        return (String)(this.dropDownPanel.getSelectedItem());
+        return (String)(this.dropDownPanel.getSelectedItem()); //getSelectedItem returns an object, need to cast it to a string
     }
 
     public void closeHomeGUI(){
