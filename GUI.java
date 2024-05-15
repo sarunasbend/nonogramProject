@@ -42,10 +42,10 @@ public class GUI extends JFrame {
     }
 
     private void initMainFrame(){
-        FrameImage bg = new FrameImage("guiImages/frameMain.png");
+        FrameImage bg = new FrameImage("guiImages/temp5.png");
         setContentPane(bg);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 800);
+        setSize(700, 900);
         setLayout(null);
         setVisible(true);
         setResizable(false);
@@ -60,7 +60,7 @@ public class GUI extends JFrame {
 
     private void initMainPanel(){
         this.mainPanel = new JPanel(new BorderLayout());
-        this.mainPanel.setBounds(135,200, 400, 400);
+        this.mainPanel.setBounds(185,250, 400, 400);
         this.mainPanel.setBackground(new Color(255, 213, 00));
         this.mainPanel.add(this.nonogramPanel, BorderLayout.CENTER);
     }
@@ -68,32 +68,32 @@ public class GUI extends JFrame {
     private void initLeftPanel(){
         this.leftPanel = new JPanel(new BorderLayout());
         this.leftPanel.setBackground(new Color(255,213,0));
-        this.leftPanel.setBounds(60,200,75,400);
+        this.leftPanel.setBounds(60,250,125,400);
         this.leftPanel.add(this.leftNumbersPanel, BorderLayout.CENTER);
     }
 
     private void initTopPanel(){
         this.topPanel = new JPanel(new BorderLayout());
         this.topPanel.setBackground(new Color(255,213,0));
-        this.topPanel.setBounds(135, 125, 400, 75);
+        this.topPanel.setBounds(190, 125, 400, 125);
         this.topPanel.add(this.topNumbersPanel, BorderLayout.CENTER);
     }
 
     private void initToolPanel(){
         this.toolPanel = new JPanel(new BorderLayout());
         this.toolPanel.setBackground(new Color(255,213,0));
-        this.toolPanel.setBounds(125, 625, 325,50);
+        this.toolPanel.setBounds(190, 700, 325,50);
         this.toolPanel.add(this.colourButtonsPanel);
     }
 
     private void initConditionsPanel(){
         this.conditionsPanel = new JPanel(new BorderLayout());
         this.conditionsPanel.setBackground(new Color(255,213,0));
-        this.conditionsPanel.setBounds(125, 690, 325, 25);
+        this.conditionsPanel.setBounds(190, 760, 325, 25);
         this.conditionsPanel.add(this.buttonsPanel);
     }
 
     private void initCheckSum(){
-        this.checkSumLabel.setBounds(70,130,50,50);
+        this.checkSumLabel.setBounds(80,140,75,75);
     }
 }

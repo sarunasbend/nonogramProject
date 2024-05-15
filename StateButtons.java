@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import java.awt.color.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 public class StateButtons {
     private Nonogram nonogram;
@@ -18,7 +19,7 @@ public class StateButtons {
     private JPanel buttonsPanel;
     private JButton checkButton;
     private JButton completeButton;
-    private Font mainFont = new Font("Impact", Font.PLAIN, 30);
+    private Font mainFont = new Font("Impact", Font.PLAIN, 50);
 
     public StateButtons(Nonogram nonogramPuzzle){
         this.nonogram = nonogramPuzzle;
@@ -59,7 +60,7 @@ public class StateButtons {
         JButton complete = new JButton(completeImage);
         complete.setBackground(new Color(255,213,0));
         //action listener detects when button was pressed
-        complete.addMouseListener(new MouseAdapter() {
+        complete.addMouseListener(new MouseAdapter(){
             int timesPressed = 0; //first cick = incorrect, second click = complete 
             public void mouseClicked(MouseEvent event){
                 if (timesPressed == 0){
@@ -89,14 +90,14 @@ public class StateButtons {
     }
 
     private void winnerCheckSum(){
-        Font winnerFont = new Font("IMPACT", Font.PLAIN, 15);
+        Font winnerFont = new Font("IMPACT", Font.PLAIN, 20);
         this.checkSum.setFont(winnerFont);
         this.checkSum.setForeground(new Color(0,0,255));
         this.checkSum.setText("WINNER");
     }
 
     private void loserCheckSum(){
-        Font loserFont = new Font("IMPACT", Font.PLAIN, 20);
+        Font loserFont = new Font("IMPACT", Font.PLAIN, 30);
         this.checkSum.setFont(loserFont);
         this.checkSum.setForeground(new Color(255, 0, 0));
         this.checkSum.setText("LOSER");
