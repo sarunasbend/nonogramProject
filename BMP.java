@@ -2,7 +2,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.BufferOverflowException;
 
 public class BMP {
     private String fileLocation;
@@ -18,7 +17,6 @@ public class BMP {
 
     public BMP(String fileLocation) throws IOException{
         this.fileLocation = fileLocation;
-        createTxt();
         setHeader();
         setWidth();
         setHeight();
@@ -27,17 +25,16 @@ public class BMP {
         setPixelDataLocation();
         setUnparsedPixelData();
         setParsedPixelData();
-        createTxt();
     }
         
-    //creates a txt of the all the values held in the bmp file, so its readable 
+    //debugging method, creates a txt of the all the values held in the bmp file, so it's readable
     private void createTxt() throws IOException {
         FileInputStream in = null;
         FileOutputStream out = null;
 
         try {
-            in = new FileInputStream(this.fileLocation);
-            out = new FileOutputStream("output.txt");
+            in = new FileInputStream(this.fileLocation); //file location of specified bmp file
+            out = new FileOutputStream("output.txt"); //will create a new file with the data from the bmp
             int c;
             while ((c = in.read()) != -1){
                 out.write(c);
@@ -52,7 +49,8 @@ public class BMP {
         }
     }
 
-    //takes the first 62 bytes of the bmp and places them into byte array, so easier to access important details about bmp file
+    //takes the first 54 bytes of the bmp and places them into byte array, so easier to access important details about bmp file
+    //header will always be 54 bytes within a bmp file
     private void setHeader(){
         try {
             FileInputStream bmp = new FileInputStream(this.fileLocation);
@@ -67,110 +65,122 @@ public class BMP {
         }
     }
 
-    private void getHeader(){
-
+    private byte[] getHeader(){
+        return this.header;
     }
 
-    //width information will always be in byte addresses 18, 19, 20. 
+    //width information will always be in byte addresses 18, 19, 20 and 21 of header
     private void setWidth(){
-        //bmp files are in little endian, so bytes 19 and 20 are shifted logically to the left by 1 byte, 2 byte respectively.
+        //bmp files are in little endian, so bytes 19, 20, 21 are shifted logically to the left by 1 byte, 2 byte, 3 bytes respectively, and then combined to 
+        //together using bitwise OR, to generate the width of the image 
         this.width = (this.header[18] & 0xff) | ((this.header[19] & 0xff) << 8) | ((this.header[20] & 0xff) << 16) | ((this.header[21] & 0xff) << 24);
     }
 
+    //returns width attribute, necessary for taking parsed pixel data and translating it into a nonogram puzzle
     public int getWidth(){
         return this.width;
     }
 
+    //height information will always be in byte addresses 22, 23, 24, and 25 of header
     private void setHeight(){
         this.height = (this.header[22] & 0xff) | ((this.header[23] & 0xff) << 8) | ((this.header[24] & 0xff) << 16) | ((this.header[25] & 0xff) << 24);
     }
 
+    //return height attribute
     public int getHeight(){
         return this.height;
     }
 
+    //size of whole file information will always be in byte addresses 2, 3, 4 and 5 of header
     private void setSize(){
         this.size = (this.header[2] & 0xff) | ((this.header[3] & 0xff) << 8) | ((this.header[4] & 0xff) << 16) |((this.header[5] & 0xff) << 24);
     }
 
+    //return size of whole file
     public int getSize(){
         return this.size;
     }
 
+    //bpp information will always be in byte address 28 and 29
+    //determines how the image is encoded within the pixel data section
     private void setBitsPerPixel(){
         this.bitsPerPixel = (this.header[28] & 0xff) | ((this.header[29] & 0xff) << 8);
     }
 
+    //return bits per pixel 
     public int getBitsPerPixel(){
         return this.bitsPerPixel;
     }
 
+    //depending on what the bits per pixel is, it will either have a colour palette (1, 4, 8), or it won't (16, 24, 32), thus location of pixel data starts varies
     private void setPixelDataLocation(){
         this.pixelDataLocation = (this.header[10] & 0xff) | ((this.header[11] & 0xff) << 8 ) | ((this.header[12] & 0xff) << 16) | ((this.header[13] & 0xff) << 24);
     }
 
+    //return location of where pixel data starts
     private int getPixelDataLocation(){
         return this.pixelDataLocation;
     }
 
     private void setColourPalette(){
+        //FUTURE IMPLEMENTATION
         //only necessary for bit-depths 1, 4, 8
         //pixel data is actually an index to an RGB value
     }
 
-    private void getColourPalette(){
-
+    private byte[] getColourPalette(){
+        return this.colourPalette;
     }
 
+    //takes the pixel data from the bmp file and copies into a byte array, which can then be manipulated
     private void setUnparsedPixelData(){
         try {
             FileInputStream bmp = new FileInputStream(this.fileLocation);
             BufferedInputStream buffer = new BufferedInputStream(bmp);
-            this.unparsedPixelData = new byte[getSize() - getPixelDataLocation()];
-            buffer.skip(getPixelDataLocation());
-            buffer.read(this.unparsedPixelData);
-
+            this.unparsedPixelData = new byte[getSize() - getPixelDataLocation()]; //size of file - size of header
+            buffer.skip(getPixelDataLocation()); //skips to start of pixel data
+            buffer.read(this.unparsedPixelData); //copies the bmp data into byte array
             buffer.close();
             bmp.close();
         } catch (IOException exception){
-            exception.printStackTrace();
+            exception.printStackTrace(); 
         }
     }
 
-    private void getUnparsedPixelData(){
-        
+    //returns raw pixel data
+    private byte[] getUnparsedPixelData(){
+        return this.unparsedPixelData;
     }
     
+    //unparsed pixel data is read and then parsed depending on the bits per pixel attribute
+    //ONLY WORKS WITH 1 BIT DEPTH AND 24 BIT DEPTH
     private void setParsedPixelData(){
-        int index = 0;
-        int padding = 0;
-        int validBits = 0;
-        int bytesTakenByRow;
-        //with bit depths 1, 4, 8, instead of storing the colour in the actual pixel data, 
-        //it is actually an index to the colour palette 
+        int index = 0; //track index of parsedPixelData array
+        int padding = 0; //bmp files need to have a width divisible by 4, padding (null bytes) are added to ensure this 
+        int validBits = 0; //tracks the current width of the parsed pixel data row, adds padding if it is equal to width
+        int bytesTakenByRow; 
         switch (this.bitsPerPixel) {
+            //a byte represents 8 pixels, white is 1, black is 0
             case 1:
-                //a byte represents 8 pixels
-                //white is 1
-                //black is 0
+                //calculates the padding needed to add in relation to the amount of bits the row takes up
                 if ((this.width) % 8 == 0){
                     bytesTakenByRow = ((this.width) / 8);
                 } else {
                     bytesTakenByRow = ((this.width) / 8) + 1;
                 }
                 padding = ((4 - (bytesTakenByRow % 4)) % 4);
-                this.parsedPixelData = new int[this.height * this.width][3];
+                this.parsedPixelData = new int[this.height * this.width][3]; //2D array, 1st dimension for individual bits, 2nd dimension is colour of those individual bits
 
                 for (int i = 0; i < this.unparsedPixelData.length; i++){
-                    for (int j = 7; j >= 0; j--){
+                    for (int j = 7; j >= 0; j--){ //most significant bit is leftmost pixel within row (due to little endian)
                         validBits++;
-                        if ((unparsedPixelData[i] & (1 << j)) != 0){
+                        if ((unparsedPixelData[i] & (1 << j)) != 0){ //logically shifts 1 by j, to get j bit of the byte 
                             parsedPixelData[index][0] = 255;
                             parsedPixelData[index][1] = 255;
                             parsedPixelData[index][2] = 255;
                         }
                         index++;
-                        if ((validBits) % this.width == 0){
+                        if ((validBits) % this.width == 0){ //reached end of row
                             i = i + padding;
                             validBits = 0;
                             break;
@@ -178,14 +188,14 @@ public class BMP {
                     }
                 }
                 break;
+            //1 byte represents 2 pixels
             case 4:
-                //1 byte represents 2 pixels
                 if (this.width % 4 != 0){
                     padding = (4 - (this.width % 4));
                 }
                 break;
+            //1 byte represents 1 pixel
             case 8:
-                //1 byte represents 1 pixel
                 if (this.width % 4 != 0){
                     padding = (4 - (this.width % 4));
                 }
@@ -198,8 +208,8 @@ public class BMP {
                     }
                 }
                 break;
-            case 16:
-                //2 bytes represents 1 pixel            
+            //2 bytes represents 1 pixel
+            case 16:        
                 //bytes are split into RGB555/RGB656, 5 bits for red, 5/6 bits for green, 5 bits for blue
                 if (this.width % 4 != 0){
                     padding = (4 - (this.width % 4));
@@ -220,10 +230,9 @@ public class BMP {
                     }
                 }
                 break;
+            //3 bytes represents 1 pixel
+            //1 byte = red, 1 byte = green, 1 byte = blue (RGB encoding)    
             case 24:
-                //i believe it is working correctly
-                //3 bytes represents 1 pixel
-                //with each byte representing an RGB value
                 if ((this.width * 3) % 4 != 0){
                     padding = (4 - ((this.width * 3) % 4));
                 }
@@ -250,7 +259,7 @@ public class BMP {
                     parsedPixelData[index][2] = unparsedPixelData[i] & 0xff;
                     parsedPixelData[index][1] = unparsedPixelData[i + 1] & 0xff;
                     parsedPixelData[index][0] = unparsedPixelData[i + 2] & 0xff;
-                    //parsedPixelData[index][0] = unparsedPixelData[i + 3] & 0xff; //this is the alpha channel so it will regulate opacity i belive (not necessary)
+                    parsedPixelData[index][0] = unparsedPixelData[i + 3] & 0xff; //this is the alpha channel so it will regulate opacity i belive (not necessary)
                     index++;
                     if (((i + 1) % this.width) == 0){
                         i = i + padding;

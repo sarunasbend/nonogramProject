@@ -11,12 +11,12 @@ public class Driver {
                 event.printStackTrace();
             }
         }
-        BMP bmp = new BMP("puzzleImages/" + homeGUI.getDropDownMenuSelected()); //cannot do 16 bit-depths yet
+        BMP bmp = new BMP("puzzleImages/" + homeGUI.getDropDownMenuSelected());
         homeGUI.closeHomeGUI();
-        Nonogram puzzle = new Nonogram(bmp, false);
+        Nonogram puzzle = new Nonogram(bmp);
         ArrayList<int[]> colourPalette = puzzle.getColourPalette();
         ColourButtons buttons = new ColourButtons(colourPalette, puzzle);
         StateButtons check = new StateButtons(puzzle);
-        GUI mainGUI = new GUI(puzzle.getNonogramPanel(), buttons.getColourButtonPanel(), check.getButtonsPanel(), puzzle.getLeftGridPanel(), puzzle.getBottomGridPanel(), check.getCheckSumLabel());
+        GUI mainGUI = new GUI(puzzle.getNonogramPanel(), buttons.getColourButtonPanel(), check.getButtonsPanel(), puzzle.getLeftGridPanel(), puzzle.getTopGridPanel(), check.getCheckSumLabel());
     }
 }
