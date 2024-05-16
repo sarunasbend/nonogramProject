@@ -99,6 +99,6 @@ public class GUI extends JFrame {
     //Only component that is not within a frame, due to it not needing to be dynamically placed
     //Displays the checkSum after pressing check, also displays whether the user has won or lost at end of game
     private void initCheckSum(){
-        this.checkSumLabel.setBounds(80,140,75,75);
+        this.checkSumLabel.setBounds(80,140,90,90);
     }
 }
