@@ -76,7 +76,7 @@ public class HomeGUI extends JFrame {
 
     //creates window
     private void initMainFrame(){
-        FrameImage backgroundImage = new FrameImage("guiImages/home3.png"); //set image as background
+        FrameImage backgroundImage = new FrameImage("guiImages/home.png"); //set image as background
         setContentPane(backgroundImage);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
