@@ -1,5 +1,5 @@
 # nonogramProject
-Lancaster University First Year Summer Project
+Lancaster University First Year Summer Project.
 Put a .bmp file within puzzleImages directory, to see it transform into a Nonogram puzzle. 
 Only 1 bit depth and 24 bit depth is supported currently. Upon running the program, you can select
 between all of your .bmp files. After selecting your desired puzzle, press play! After loading the
