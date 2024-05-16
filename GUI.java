@@ -1,10 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
 
 //inherited jframe class
 public class GUI extends JFrame {
@@ -25,6 +20,8 @@ public class GUI extends JFrame {
 
     private JLabel checkSumLabel; //number of correctly placed tiles (will only show if checked)
 
+    //GUI constructor, JPanels instances are created in other class and passed as parameter. In order
+    //to help prevent bloat of GUI class, and allow for more modularity
     public GUI(JPanel nonogramPanel, JPanel colourButtonsPanel, JPanel buttonsPanel, JPanel leftNumbersPanel, JPanel topNumbersPanel, JLabel checkSumLabel){
         this.checkSumLabel = checkSumLabel;
         this.nonogramPanel = nonogramPanel;
@@ -32,23 +29,24 @@ public class GUI extends JFrame {
         this.leftNumbersPanel = leftNumbersPanel;
         this.topNumbersPanel = topNumbersPanel;
         this.buttonsPanel = buttonsPanel;
+        //all panels created seperately and then added to mainFrame
         initMainPanel();
         initLeftPanel();
         initTopPanel();
         initToolPanel();
         initConditionsPanel();
         initCheckSum();
-        initMainFrame();
+        initMainFrame(); //called last after all other panels have been created
     }
 
     private void initMainFrame(){
-        FrameImage bg = new FrameImage("guiImages/temp5.png");
+        FrameImage bg = new FrameImage("guiImages/frameMain.png"); //set image as frame background
         setContentPane(bg);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(700, 900);
         setLayout(null);
         setVisible(true);
-        setResizable(false);
+        setResizable(false); //GUI does not scale due to null layout implementation
         
         getContentPane().add(this.mainPanel);
         getContentPane().add(this.leftPanel);
@@ -58,6 +56,7 @@ public class GUI extends JFrame {
         getContentPane().add(this.checkSumLabel);
     }
 
+    //JPanel where the nonogram will be
     private void initMainPanel(){
         this.mainPanel = new JPanel(new BorderLayout());
         this.mainPanel.setBounds(185,250, 400, 400);
@@ -65,6 +64,7 @@ public class GUI extends JFrame {
         this.mainPanel.add(this.nonogramPanel, BorderLayout.CENTER);
     }
 
+    //JPanel where the left numbers will be
     private void initLeftPanel(){
         this.leftPanel = new JPanel(new BorderLayout());
         this.leftPanel.setBackground(new Color(255,213,0));
@@ -72,6 +72,7 @@ public class GUI extends JFrame {
         this.leftPanel.add(this.leftNumbersPanel, BorderLayout.CENTER);
     }
 
+    //JPanel where the top numbers will be
     private void initTopPanel(){
         this.topPanel = new JPanel(new BorderLayout());
         this.topPanel.setBackground(new Color(255,213,0));
@@ -79,13 +80,15 @@ public class GUI extends JFrame {
         this.topPanel.add(this.topNumbersPanel, BorderLayout.CENTER);
     }
 
+    //JPanel where all the colours will be
     private void initToolPanel(){
         this.toolPanel = new JPanel(new BorderLayout());
         this.toolPanel.setBackground(new Color(255,213,0));
-        this.toolPanel.setBounds(190, 700, 325,50);
+        this.toolPanel.setBounds(190, 700, 325,50); //if many colours, very compact
         this.toolPanel.add(this.colourButtonsPanel);
     }
 
+    //JPanel where the check and complete buttons will be 
     private void initConditionsPanel(){
         this.conditionsPanel = new JPanel(new BorderLayout());
         this.conditionsPanel.setBackground(new Color(255,213,0));
@@ -93,6 +96,8 @@ public class GUI extends JFrame {
         this.conditionsPanel.add(this.buttonsPanel);
     }
 
+    //Only component that is not within a frame, due to it not needing to be dynamically placed
+    //Displays the checkSum after pressing check, also displays whether the user has won or lost at end of game
     private void initCheckSum(){
         this.checkSumLabel.setBounds(80,140,75,75);
     }

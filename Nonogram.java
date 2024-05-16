@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -34,7 +33,7 @@ public class Nonogram {
     private JLabel[][] topNumbers;
     private Font mainFont = new Font("Impact", Font.PLAIN, 8); //font of the labels and buttons
 
-    //hardmode will be determined by the home menu
+    //constructor, setting key attributes
     public Nonogram(BMP bmp){
         this.bmp = bmp;
         this.width = bmp.getWidth();
@@ -55,7 +54,7 @@ public class Nonogram {
         completeNonogramPanel(); //completes the nonogram to get the colour palette
 
         setColourPalette();
-        setColour(0, 0, 0);
+        setColour(0, 0, 0); //default colour when game starts
 
         initialiseNonogramPanel(); //nonogram is cleared after colour palette
         setValidTiles();
@@ -85,7 +84,7 @@ public class Nonogram {
         for (int i = 0; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
                 if ((this.userNonogramData[i][j][0] != this.solvedNonogramData[i][j][0]) || (this.userNonogramData[i][j][1] != this.solvedNonogramData[i][j][1]) || (this.userNonogramData[i][j][2] != this.solvedNonogramData[i][j][2])){
-                    this.nonogramTilesPanels[i][j].setBackground(new Color(255, 0, 0));
+                    this.nonogramTilesPanels[i][j].setBackground(new Color(255, 0, 0)); //red = incorrectly placed tile
                     count++;
                 }
             }
@@ -119,7 +118,7 @@ public class Nonogram {
         this.colourPalette = new ArrayList<int[]>(); //undetermined number of colours, can't use static array
         for (int i = 0; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
-                int rgb[] = new int[3];
+                int rgb[] = new int[3]; //stores colour of current tile
                 if (this.colourPalette.size() == 0){ //adds first colour
                     rgb[0] = this.nonogramTilesPanels[i][j].getBackground().getRed();
                     rgb[1] = this.nonogramTilesPanels[i][j].getBackground().getGreen();
@@ -130,7 +129,7 @@ public class Nonogram {
                     int red = this.nonogramTilesPanels[i][j].getBackground().getRed();
                     int green = this.nonogramTilesPanels[i][j].getBackground().getGreen();
                     int blue = this.nonogramTilesPanels[i][j].getBackground().getBlue();
-                    for (int[] colours : this.colourPalette){ //searches if coloour already added
+                    for (int[] colours : this.colourPalette){ //searches if coloour already added within colour palette
                         if ((colours[0] == red) && (colours[1] == green) && (colours[2] == blue)){
                             found = true;
                         }
@@ -151,11 +150,11 @@ public class Nonogram {
         return this.colourPalette;
     }
 
-    //dynamically calculates the number of consecutive tiles of the same colour on the same row, ignoring white
+    //dynamically calculates the number of consecutive tiles of the same colour on the same row
     private void setRowTiles(){
-        this.rowTiles = new ArrayList<>();
+        this.rowTiles = new ArrayList<>(); //store information about every row
         for (int i = 0; i < this.height; i++){
-            ArrayList<Integer[]> row = new ArrayList<>();
+            ArrayList<Integer[]> row = new ArrayList<>(); //stores information about specific row
             int index = 0;
             for (int j = 0; j < this.width; j++){
                 Integer frgb[] = new Integer[4];
@@ -187,7 +186,7 @@ public class Nonogram {
         return this.rowTiles;
     }
 
-    //calculates the number of coloured tiles (anything but white) in every column
+    //calculates the number of coloured tiles in every column
     private void setColumnTiles(){
         this.columnTiles = new ArrayList<>();
         for (int i = 0; i < this.width; i++){
@@ -205,7 +204,7 @@ public class Nonogram {
                     if ((this.solvedNonogramData[j - 1][i][0] == frgb[1]) && (this.solvedNonogramData[j - 1][i][1] == frgb[2]) && (this.solvedNonogramData[j - 1][i][2] == frgb[3])){
                         frgb = column.get(index);
                         frgb[0]++;
-                        column.set(index, frgb);
+                        column.set(index, frgb); //if same as previous colour increments frequency 
                     } else {
                         frgb[0] = 1;
                         column.add(frgb);
@@ -213,7 +212,7 @@ public class Nonogram {
                     }
                 }
             }
-            Collections.reverse(column);
+            Collections.reverse(column); //consecutive tiles are counted from bottom to top, flips it so its from top to bottom
             this.columnTiles.add(column);
         }
     }
@@ -223,12 +222,13 @@ public class Nonogram {
     }
 
     //to allow for the numbers on the side to be dynamically placed, we need to know the number of max numbers per row
+    //remaining spaces when relevant will be filled with blank space
     private void setWidthOfRowNumbers(){
         int max = 0;
         for (ArrayList<Integer[]> row : this.rowTiles){
             int temp = 0;
             for (Integer[] number : row){
-                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
+                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){ //white consecutive tiles are ignored as they will not be in the GUI
                     temp++;
                 }
             }
@@ -243,6 +243,7 @@ public class Nonogram {
         return this.widthOfRowNumbers;
     }
 
+    //to allow for dynamic placement of GUI elements, we also need to know the max number of numbers per column
     private void setWidthOfColumnNumbers(){
         int max = 0;
         for (ArrayList<Integer[]> column : this.columnTiles){
@@ -260,7 +261,8 @@ public class Nonogram {
     public int getWidthOfColumnNumbers(){
         return this.widthOfColumnNumbers;
     }
-    //GUI section of the class
+
+    //GUI SECTION OF THE CLASS
 
     //initial colour of the tile that will be placed
     public void setColour(int red, int green, int blue){
@@ -271,6 +273,7 @@ public class Nonogram {
     }
 
     //change the colour of the tile that will be placed
+    //will change depending on the colour the user selects
     public void changeColour(int red, int green, int blue){
         this.colour[0] = red;
         this.colour[1] = green;
@@ -281,19 +284,18 @@ public class Nonogram {
         return this.colour;
     }
 
-    //creates nonogram grid 
+    //creates nonogram grid panel that will be placed within GUI
     private void initialiseNonogramPanel(){
-        this.nonogramPanel = new JPanel();
-        this.nonogramPanel.setLayout(new GridLayout(this.height, this.width));
+        this.nonogramPanel = new JPanel(); 
+        this.nonogramPanel.setLayout(new GridLayout(this.height, this.width)); //grid layout so tiles are consistent
         this.nonogramPanel.setBackground(new Color(255, 213, 0));
-        this.nonogramTilesPanels = new JPanel[this.height][this.width];
+        this.nonogramTilesPanels = new JPanel[this.height][this.width]; //individual tiles added to array to allow for event listeners
         for (int i = 0 ; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
-                this.nonogramTilesPanels[i][j] = initialiseNonogramTilePanel(i,j);
+                this.nonogramTilesPanels[i][j] = initialiseNonogramTilePanel(i,j); //creates tile, adds action listener
             }
         }
-        //this part is essential as the nonogram will be inverted if not added in this way.
-        //comparison will still be the same as it the tiles initialised start from the top most left 
+        //tiles added to panel start from the top most left and top tile
         for (int i = this.height - 1; i >= 0 ; i--){
             for (int j = 0; j < this.width; j++){
                 this.nonogramPanel.add(this.nonogramTilesPanels[i][j]);
@@ -305,9 +307,9 @@ public class Nonogram {
     private JPanel initialiseNonogramTilePanel(int indexX, int indexY){
         JPanel nonogramTile = new JPanel();
         nonogramTile.setBackground(Color.WHITE);
-        nonogramTile.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        nonogramTile.setBorder(BorderFactory.createLineBorder(Color.BLACK)); //differentitate the tiles
         nonogramTile.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent event){
+            public void mousePressed(MouseEvent event){ //if mouse is pressed, change to selected colour
                 int red = getColours()[0];
                 int green = getColours()[1];
                 int blue = getColours()[2];
@@ -322,30 +324,28 @@ public class Nonogram {
         return nonogramTile;
     }
 
-    //creates the left grid for the numbers 
+    //creates the left grid for the numbers
     private void initaliseLeftGrid(){
-        this.leftGrid = new JPanel();
+        this.leftGrid = new JPanel(); //numbers will be stored in panel
         this.leftGrid.setLayout(new GridLayout(this.height, getWidthOfRowNumbers()));
         this.leftGrid.setBackground(new Color(255, 213, 0));
-        this.leftNummbers = new JLabel[this.height + 1][getWidthOfRowNumbers()];
+        this.leftNummbers = new JLabel[this.height][getWidthOfRowNumbers()];
         int indexX = 0;
         for (ArrayList<Integer[]> row : this.rowTiles){
             int indexY = 0;
             for (Integer[] number : row){
-                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
+                if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){ //if consecutive tiles are not white
                     this.leftNummbers[indexX][indexY] = new JLabel(Integer.toString(number[0]));
                     this.leftNummbers[indexX][indexY].setFont(this.mainFont);
-                    this.leftNummbers[indexX][indexY].setForeground(new Color(number[1], number[2], number[3]));
-                    //this.leftNummbers[indexX][indexY].setBackground(new Color(255, 213, 0));
-
+                    this.leftNummbers[indexX][indexY].setForeground(new Color(number[1], number[2], number[3])); //number needs to have colour 
                     indexY++;
                 }
             }
+            //adds blank labels to make sure the numbers are alligned correctly
             if (indexY < getWidthOfRowNumbers()){
                 for (;indexY < getWidthOfRowNumbers(); indexY++){
                     this.leftNummbers[indexX][indexY] = new JLabel();
                     this.leftNummbers[indexX][indexY].setBackground(new Color(255, 213, 0));
-                    //this.leftGrid.add(this.leftNummbers[indexX][indexY]);
                 }
             }
             indexX++;
@@ -361,79 +361,14 @@ public class Nonogram {
         return this.leftGrid;
     }
 
-    //think of a better name
-    /*private void initialiseTopGrid(){
-        this.topGrid = new JPanel();
-        this.topGrid.setLayout(new GridLayout(getWidthOfColumnNumbers(), this.width));
-        this.topGrid.setBackground(new Color(255, 213, 0));
-        this.topNumbers = new JLabel[getWidthOfColumnNumbers()][this.width];
-        int indexY = 0;
-        for (ArrayList<Integer[]> column : this.columnTiles){
-            for (int indexX = getWidthOfColumnNumbers(); indexX > getWidthOfColumnNumbers() - column.size(); indexX--){
-                this.topNumbers[indexX][indexY] = new JLabel();
-            }
-
-            for (int indexX = 0; indexX < column.size(); indexX++){
-                if ((column.get(indexX)[1] != 255) || (column.get(indexX)[2] != 255) || (column.get(indexX)[3] != 255)){
-                    this.topNumbers[indexX][indexY] = new JLabel(Integer.toString(column.get(indexX)[0]));
-                    this.topNumbers[indexX][indexY].setFont(this.mainFont);
-                    this.topNumbers[indexX][indexY].setForeground(new Color(column.get(indexX)[1], column.get(indexX)[2], column.get(indexX)[3]));
-                }
-            }
-            indexY++;
-        }
-    }*/
-
-        //think of a better name
-        /*private void initialiseBottomGrid(){
-            this.topGrid = new JPanel();
-            this.topGrid.setLayout(new GridLayout(getWidthOfColumnNumbers(), this.width));
-            this.topGrid.setBackground(new Color(255, 213, 0));
-            this.topNumbers = new JLabel[getWidthOfColumnNumbers()][this.width];
-            int indexY = 0;
-            for (ArrayList<Integer[]> column : this.columnTiles){
-                int indexX = 0;
-                for (Integer[] number : column){
-                    if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
-                        this.topNumbers[indexX][indexY] = new JLabel(Integer.toString(number[0]));
-                        this.topNumbers[indexX][indexY].setFont(this.mainFont);
-                        this.topNumbers[indexX][indexY].setForeground(new Color(number[1], number[2], number[3]));
-                        //this.topNumbers[indexX][indexY].setBackground(new Color(255, 213, 0));
-                        indexX++;
-                    }
-                }
-                if (indexX < getWidthOfColumnNumbers()){
-                    for (;indexX < getWidthOfColumnNumbers(); indexX++){
-                        this.topNumbers[indexX][indexY] = new JLabel("A");
-                        //this.topNumbers[indexX][indexY].setBackground(new Color(255, 213, 0));
-                    }
-                }
-                indexY++;
-            }
-            for (int indexX = getWidthOfColumnNumbers() - 1; indexX >= 0; indexX--){
-                for (indexY = 0; indexY < this.width; indexY++){
-                    if (this.topNumbers[indexX][indexY].getText().equals("A")){
-                        this.topGrid.add(this.topNumbers[indexX][indexY]);
-                    } else {
-                        break;
-                    }
-                }
-
-                for (int temp = indexY; temp < this.width; temp++){
-                    this.topGrid.add(this.topNumbers[indexX][indexY]);
-                }
-            }
-
-
-        }*/
-
+    //used to intialise the numbers of consecutive tiles at the top of nonograms
     private void initialiseTopGrid(){
         this.topGrid = new JPanel();
-        this.topGrid.setLayout(new GridLayout(getWidthOfColumnNumbers(), this.width));
+        this.topGrid.setLayout(new GridLayout(getWidthOfColumnNumbers(), this.width)); 
         this.topGrid.setBackground(new Color(255, 213, 0));
         this.topNumbers = new JLabel[getWidthOfColumnNumbers()][this.width];
         int indexY = 0;
-        for (ArrayList<Integer[]> column : this.columnTiles){
+        for (ArrayList<Integer[]> column : this.columnTiles){ //iterates through every column and every number in column
             int indexX = 0;
             for (Integer[] number : column){
                 if ((number[1] != 255) || (number[2] != 255) || (number[3] != 255)){
@@ -444,6 +379,7 @@ public class Nonogram {
                     indexX++;
                 }
             }
+            //if the number of numbers in column != max width of column numbers, adds blank labels for padding 
             if (indexX < getWidthOfColumnNumbers()){
                 for (;indexX < getWidthOfColumnNumbers(); indexX++){
                     this.topNumbers[indexX][indexY] = new JLabel();
@@ -452,6 +388,7 @@ public class Nonogram {
             }
             indexY++;
         }
+        //adds to GUI
         for (int indexX = getWidthOfColumnNumbers() - 1; indexX >= 0; indexX--){
             for (indexY = 0; indexY < this.width; indexY++){
                 this.topGrid.add(this.topNumbers[indexX][indexY]);
@@ -464,6 +401,7 @@ public class Nonogram {
         return this.topGrid;
     }
     
+    //called when specific tile is pressed, changing its colour
     private void changeUserNonogram(int indexX, int indexY){
         this.userNonogramData[indexX][indexY][0] = this.colour[0];
         this.userNonogramData[indexX][indexY][1] = this.colour[1];
@@ -473,13 +411,14 @@ public class Nonogram {
     //method that will return the number of remaining tiles that the user needs to place
     public void setCheckSum(){
         this.checkSum = this.validTiles;
+        //looks at solved nonogram data and compares to user's nonogram data
         for (int i = 0; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
                 int red = this.solvedNonogramData[i][j][0];
                 int green = this.solvedNonogramData[i][j][1];
                 int blue = this.solvedNonogramData[i][j][2];
-                if ((red == this.userNonogramData[i][j][0]) && (green == this.userNonogramData[i][j][0]) && (blue == this.userNonogramData[i][j][2])){
-                    if ((red != 255) && (green != 255) && (blue != 255)) {
+                if ((red == this.userNonogramData[i][j][0]) && (green == this.userNonogramData[i][j][0]) && (blue == this.userNonogramData[i][j][2])){ //colour of user's nonogram matches solved solved nonogram
+                    if ((red != 255) || (green != 255) || (blue != 255)) {
                         this.checkSum--;
                     }
                 }
@@ -492,10 +431,12 @@ public class Nonogram {
         return this.checkSum;
     }
 
+    //will need to be passed as a paramter in GUI object instance
     public JPanel getNonogramPanel(){
         return this.nonogramPanel;
     }
 
+    //finishes nonogram puzzle, but does not change the user's data, only visual
     public void completeNonogramPanel(){
         for (int i = 0; i < this.height; i++){
             for (int j = 0; j < this.width; j++){
@@ -504,15 +445,17 @@ public class Nonogram {
         }
     }
 
-
+    //width of nonogram
     public int getWidth(){
         return this.width;
     }
 
+    //height of nonogram
     public int getHeight(){
         return this.height;
     }
 
+    //counts the number of tiles the user needs to place to win the game
     private void setValidTiles(){
         this.validTiles = 0;
         for (int i = 0; i < this.height; i++){
@@ -523,7 +466,7 @@ public class Nonogram {
             }
         }
     }
-
+    
     public int getValidTiles(){
         return this.validTiles;
     }

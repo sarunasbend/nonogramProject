@@ -5,20 +5,24 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
+//class that will allow for setting images as the background of JFrame
 class FrameImage extends JPanel {
-    private BufferedImage bgImage;
+    private BufferedImage backgroundImage;
     
+    //specify the image dir as parameter
     public FrameImage(String imagePath) {
         try {
-            bgImage = ImageIO.read(new File(imagePath));
+            backgroundImage = ImageIO.read(new File(imagePath)); //sets attribute as image specified
         } catch (IOException event){
-            event.printStackTrace();
+            //Include a way to handle the exception
         }
     }
-    protected void paintComponent(Graphics g){
-        super.paintComponent(g);
-        if (bgImage != null){
-            g.drawImage(bgImage, 0, 0, getWidth(), getHeight(), this);
+
+    //method overriding for java swing Super class' method paintComponent (from JComponent class) to allow for custom images being set as the background of JPanels
+    public void paintComponent(Graphics frame){
+        super.paintComponent(frame); //super declaration, passing image as parameter
+        if (backgroundImage != null){ //image will be null if not appropriate image file type
+            frame.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this); //sets background to image matching height and width of JFrame
         }
     }
 }

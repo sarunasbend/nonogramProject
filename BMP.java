@@ -1,6 +1,5 @@
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class BMP {
@@ -15,6 +14,7 @@ public class BMP {
     private byte[] unparsedPixelData;
     private int[][] parsedPixelData;
 
+    //constructor, sets key attributes
     public BMP(String fileLocation) throws IOException{
         this.fileLocation = fileLocation;
         setHeader();
@@ -26,29 +26,7 @@ public class BMP {
         setUnparsedPixelData();
         setParsedPixelData();
     }
-        
-    //debugging method, creates a txt of the all the values held in the bmp file, so it's readable
-    private void createTxt() throws IOException {
-        FileInputStream in = null;
-        FileOutputStream out = null;
-
-        try {
-            in = new FileInputStream(this.fileLocation); //file location of specified bmp file
-            out = new FileOutputStream("output.txt"); //will create a new file with the data from the bmp
-            int c;
-            while ((c = in.read()) != -1){
-                out.write(c);
-            }
-        } finally {
-            if (in != null){
-                in.close();
-            }
-            if (out != null){
-                out.close();
-            }
-        }
-    }
-
+    
     //takes the first 54 bytes of the bmp and places them into byte array, so easier to access important details about bmp file
     //header will always be 54 bytes within a bmp file
     private void setHeader(){
@@ -57,11 +35,10 @@ public class BMP {
             BufferedInputStream buffer = new BufferedInputStream(bmp);
             this.header = new byte[54];
             buffer.read(this.header);
-
             buffer.close();
             bmp.close();
         } catch (IOException exception){
-            exception.printStackTrace();
+            //Add exception handling
         }
     }
 
@@ -71,12 +48,11 @@ public class BMP {
 
     //width information will always be in byte addresses 18, 19, 20 and 21 of header
     private void setWidth(){
-        //bmp files are in little endian, so bytes 19, 20, 21 are shifted logically to the left by 1 byte, 2 byte, 3 bytes respectively, and then combined to 
-        //together using bitwise OR, to generate the width of the image 
+        //bmp files are in little endian, so bytes 19, 20, 21 are shifted logically to the left by 1 byte, 2 byte, 3 bytes respectively,
+        //the byte is then accessed, and the whole byte is taken using bitwise AND, then combined together using bitwise OR, to generate the width of the image 
         this.width = (this.header[18] & 0xff) | ((this.header[19] & 0xff) << 8) | ((this.header[20] & 0xff) << 16) | ((this.header[21] & 0xff) << 24);
     }
 
-    //returns width attribute, necessary for taking parsed pixel data and translating it into a nonogram puzzle
     public int getWidth(){
         return this.width;
     }
@@ -86,7 +62,6 @@ public class BMP {
         this.height = (this.header[22] & 0xff) | ((this.header[23] & 0xff) << 8) | ((this.header[24] & 0xff) << 16) | ((this.header[25] & 0xff) << 24);
     }
 
-    //return height attribute
     public int getHeight(){
         return this.height;
     }
@@ -96,7 +71,6 @@ public class BMP {
         this.size = (this.header[2] & 0xff) | ((this.header[3] & 0xff) << 8) | ((this.header[4] & 0xff) << 16) |((this.header[5] & 0xff) << 24);
     }
 
-    //return size of whole file
     public int getSize(){
         return this.size;
     }
@@ -107,7 +81,6 @@ public class BMP {
         this.bitsPerPixel = (this.header[28] & 0xff) | ((this.header[29] & 0xff) << 8);
     }
 
-    //return bits per pixel 
     public int getBitsPerPixel(){
         return this.bitsPerPixel;
     }
@@ -117,7 +90,6 @@ public class BMP {
         this.pixelDataLocation = (this.header[10] & 0xff) | ((this.header[11] & 0xff) << 8 ) | ((this.header[12] & 0xff) << 16) | ((this.header[13] & 0xff) << 24);
     }
 
-    //return location of where pixel data starts
     private int getPixelDataLocation(){
         return this.pixelDataLocation;
     }
@@ -174,7 +146,7 @@ public class BMP {
                 for (int i = 0; i < this.unparsedPixelData.length; i++){
                     for (int j = 7; j >= 0; j--){ //most significant bit is leftmost pixel within row (due to little endian)
                         validBits++;
-                        if ((unparsedPixelData[i] & (1 << j)) != 0){ //logically shifts 1 by j, to get j bit of the byte 
+                        if ((unparsedPixelData[i] & (1 << j)) != 0){ //logically shifts 1 by j, to get j bit of the byte using bitwise AND
                             parsedPixelData[index][0] = 255;
                             parsedPixelData[index][1] = 255;
                             parsedPixelData[index][2] = 255;
@@ -249,8 +221,6 @@ public class BMP {
                 }
                 break;
             case 32:
-                //this does not work as it gets out of bound for the arrays
-                //the conversion is also not correct as it is simply case 24 copies (for now)
                 if (this.width % 4 != 0){
                     padding = (4 - (this.width % 4));
                 }
@@ -259,7 +229,7 @@ public class BMP {
                     parsedPixelData[index][2] = unparsedPixelData[i] & 0xff;
                     parsedPixelData[index][1] = unparsedPixelData[i + 1] & 0xff;
                     parsedPixelData[index][0] = unparsedPixelData[i + 2] & 0xff;
-                    parsedPixelData[index][0] = unparsedPixelData[i + 3] & 0xff; //this is the alpha channel so it will regulate opacity i belive (not necessary)
+                    parsedPixelData[index][0] = unparsedPixelData[i + 3] & 0xff; //this is the alpha channel so it will regulate opacity
                     index++;
                     if (((i + 1) % this.width) == 0){
                         i = i + padding;
@@ -273,7 +243,7 @@ public class BMP {
         }
     }
 
-    //get the result of the data parsing
+
     public int[][] getParsedPixelData(){
         return this.parsedPixelData;
     }

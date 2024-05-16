@@ -8,55 +8,56 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-import java.awt.color.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 
+//Class used to create the check and complete buttons within puzzle GUI
 public class StateButtons {
-    private Nonogram nonogram;
-    private JLabel checkSum;
+    private Nonogram nonogram; //will call different Nonogram functions, so need access to Nonogram class
+    private JLabel checkSum; 
     private JPanel buttonsPanel;
     private JButton checkButton;
     private JButton completeButton;
-    private Font mainFont = new Font("Impact", Font.PLAIN, 50);
+    private Font mainFont = new Font("Impact", Font.PLAIN,40 ); //the font of the checksum label
 
+    //constructor
     public StateButtons(Nonogram nonogramPuzzle){
         this.nonogram = nonogramPuzzle;
         initialiseStateButtons();
         initaliseCheckSum();
     }
 
+    //creates check and complete buttons
     private void initialiseStateButtons(){
         this.buttonsPanel = new JPanel(new GridLayout(1,2));
         this.buttonsPanel.setBackground(new Color(255, 213, 0));
-        this.checkButton = initialiseCheck();
+        this.checkButton = initialiseCheck(); //creates check button and adds action listener
         this.buttonsPanel.add(this.checkButton);
 
-        this.completeButton = initialiseComplete();
+        this.completeButton = initialiseComplete(); //creates complete button and adds action listener
         this.buttonsPanel.add(this.completeButton);
     }
 
     private JButton initialiseCheck(){
-        ImageIcon checkImage = new ImageIcon("guiImages/check.png");
+        ImageIcon checkImage = new ImageIcon("guiImages/check.png"); //button image
         JButton check = new JButton(checkImage);
         check.setBackground(new Color(255, 213, 0));
 
         check.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event){
-                updateCheckSumLabel();
+                updateCheckSumLabel(); //if pressed will update the label to current checksum
             }            
         });
         return check;
     }
 
     private void updateCheckSumLabel(){
-        this.nonogram.setCheckSum();
+        this.nonogram.setCheckSum(); //calculates the check sum by looking at user's input data
         this.checkSum.setText(Integer.toString(this.nonogram.getCheckSum()));
     }
 
     private JButton initialiseComplete(){
-        ImageIcon completeImage = new ImageIcon("guiImages/complete.png");
+        ImageIcon completeImage = new ImageIcon("guiImages/complete.png"); //complete image
         JButton complete = new JButton(completeImage);
         complete.setBackground(new Color(255,213,0));
         //action listener detects when button was pressed
@@ -81,14 +82,17 @@ public class StateButtons {
         return complete;
     }
 
+    //calls nonogram method to display incorrect tiles
     private int showIncorrectTiles(){
         return this.nonogram.showIncorrectTiles();
     }
 
+    //calls nonogram method to display completed nonogram
     private void showSolvedNonogram(){
         this.nonogram.completeNonogramPanel();
     }
 
+    //if checksum == 0, user is winner
     private void winnerCheckSum(){
         Font winnerFont = new Font("IMPACT", Font.PLAIN, 20);
         this.checkSum.setFont(winnerFont);
@@ -96,6 +100,7 @@ public class StateButtons {
         this.checkSum.setText("WINNER");
     }
 
+    //if checksum != 0, user is loser
     private void loserCheckSum(){
         Font loserFont = new Font("IMPACT", Font.PLAIN, 30);
         this.checkSum.setFont(loserFont);
@@ -103,10 +108,12 @@ public class StateButtons {
         this.checkSum.setText("LOSER");
     }
 
+    //needed to pass as parameter of GUI constructor
     public JPanel getButtonsPanel(){
         return this.buttonsPanel;
     }
 
+    //creates check sum label
     private void initaliseCheckSum(){
         this.checkSum = new JLabel(Integer.toString(nonogram.getCheckSum()));
         this.checkSum.setForeground(Color.BLACK);
@@ -114,6 +121,7 @@ public class StateButtons {
         this.checkSum.setBackground(new Color(255, 213, 0));
     }
 
+    //needed to pass as parameter of GUI constructor
     public JLabel getCheckSumLabel(){
         return this.checkSum;
     }
